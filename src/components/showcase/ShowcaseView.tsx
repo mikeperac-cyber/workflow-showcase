@@ -57,6 +57,7 @@ function ShowcaseCanvas({ workflow }: { workflow: Workflow }) {
           e.target === playback.currentNode?.id
         return {
           ...e,
+          selected: false,
           animated: traversed || entering || (e.animated ?? false),
           style: traversed
             ? { ...e.style, ...TRAVERSED_STYLE }
