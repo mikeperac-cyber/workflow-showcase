@@ -1,15 +1,16 @@
 import { Handle, Position } from '@xyflow/react'
 import type { NodeProps } from '@xyflow/react'
 import type { WorkflowNode } from '../../types/workflow'
-import { NODE_TYPE_META } from './shared'
+import { NODE_TYPE_META, nodeColor } from './shared'
 
 /**
  * Single custom node component for all workflow node types.
- * Visual differences (color, shape) are driven by data.nodeType,
- * and playback highlighting by the transient data.playback field.
+ * Shape is driven by data.nodeType, accent color by data.color
+ * (falling back to the type default), playback highlight by data.playback.
  */
 export function WorkflowNodeComponent({ data, selected }: NodeProps<WorkflowNode>) {
   const meta = NODE_TYPE_META[data.nodeType]
+  const color = nodeColor(data)
   const playback = data.playback ?? 'upcoming'
   const isPill = data.nodeType === 'start' || data.nodeType === 'end'
 
@@ -25,15 +26,16 @@ export function WorkflowNodeComponent({ data, selected }: NodeProps<WorkflowNode
       className={[
         'relative min-w-40 max-w-56 border-2 bg-white px-4 py-3 transition-all duration-300 dark:bg-gray-900',
         isPill ? 'rounded-full' : 'rounded-xl',
-        meta.ring,
         selected ? 'shadow-lg ring-2 ring-blue-300 dark:ring-blue-700' : 'shadow-sm',
         stateClasses,
       ].join(' ')}
+      style={{ borderColor: color }}
     >
       <Handle type="target" position={Position.Top} />
       <div className="flex items-center gap-2">
         <span
-          className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-white ${meta.accent}`}
+          className="inline-block rounded px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-white"
+          style={{ backgroundColor: color }}
         >
           {meta.label}
         </span>

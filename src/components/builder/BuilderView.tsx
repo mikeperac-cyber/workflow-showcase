@@ -1,13 +1,15 @@
 import type { DragEvent } from 'react'
+import { useMemo } from 'react'
 import type { NodeTypes } from '@xyflow/react'
 import { Background, Controls, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
 import type { Workflow, WorkflowNodeType } from '../../types/workflow'
 import { useActiveWorkflow, useSelectedNodeId, useWorkflowStore } from '../../store/workflowStore'
 import { useThemeStore } from '../../store/themeStore'
 import { WorkflowNodeComponent } from '../canvas/WorkflowNode'
-import { defaultEdgeOptions } from '../canvas/shared'
+import { decorateEdge, defaultEdgeOptions } from '../canvas/shared'
 import { BackIcon, PresentIcon, TrashIcon } from '../common/Icon'
 import { ExportMenu } from '../common/ExportMenu'
+import { EdgeEditorPanel } from './EdgeEditorPanel'
 import { NodeEditorPanel } from './NodeEditorPanel'
 import { DND_MIME, NodePalette } from './NodePalette'
 
@@ -74,7 +76,13 @@ function BuilderCanvas({ workflow }: { workflow: Workflow }) {
   const onEdgesChange = useWorkflowStore((s) => s.onEdgesChange)
   const onConnect = useWorkflowStore((s) => s.onConnect)
   const addNode = useWorkflowStore((s) => s.addNode)
+  const hasSelectedEdge = useWorkflowStore((s) => {
+    const wf = s.activeId ? s.workflows[s.activeId] : null
+    return wf?.edges.some((e) => e.selected) ?? false
+  })
   const { screenToFlowPosition } = useReactFlow()
+
+  const edges = useMemo(() => workflow.edges.map(decorateEdge), [workflow.edges])
 
   const onDragOver = (e: DragEvent) => {
     e.preventDefault()
@@ -94,7 +102,7 @@ function BuilderCanvas({ workflow }: { workflow: Workflow }) {
       <div className="relative min-w-0 flex-1">
         <ReactFlow
           nodes={workflow.nodes}
-          edges={workflow.edges}
+          edges={edges}
           nodeTypes={nodeTypes}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
@@ -111,7 +119,7 @@ function BuilderCanvas({ workflow }: { workflow: Workflow }) {
         </ReactFlow>
         <BuilderToolbar workflow={workflow} />
       </div>
-      <NodeEditorPanel />
+      {hasSelectedEdge ? <EdgeEditorPanel /> : <NodeEditorPanel />}
     </div>
   )
 }

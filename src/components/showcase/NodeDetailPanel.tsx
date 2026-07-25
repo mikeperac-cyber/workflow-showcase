@@ -1,5 +1,5 @@
 import type { Workflow, WorkflowNode } from '../../types/workflow'
-import { NODE_TYPE_META } from '../canvas/shared'
+import { NODE_TYPE_META, nodeColor } from '../canvas/shared'
 import { PlayIcon } from '../common/Icon'
 
 interface Props {
@@ -41,7 +41,10 @@ export function NodeDetailPanel({ workflow, node, stepIndex, stepCount, onPlay }
   return (
     <aside className="flex w-80 shrink-0 flex-col gap-4 overflow-y-auto border-l border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-900">
       <div className="flex items-center justify-between">
-        <span className={`rounded px-2 py-0.5 text-[10px] font-bold tracking-wider text-white ${meta.accent}`}>
+        <span
+          className="rounded px-2 py-0.5 text-[10px] font-bold tracking-wider text-white"
+          style={{ backgroundColor: nodeColor(node.data) }}
+        >
           {meta.label}
         </span>
         <span className="text-xs font-medium tabular-nums text-gray-400 dark:text-gray-500">

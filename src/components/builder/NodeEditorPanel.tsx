@@ -1,6 +1,7 @@
 import type { NodeMetric, WorkflowNodeData } from '../../types/workflow'
 import { useWorkflowStore } from '../../store/workflowStore'
-import { NODE_TYPE_META } from '../canvas/shared'
+import { NODE_TYPE_META, nodeColor } from '../canvas/shared'
+import { ColorSwatches } from '../common/ColorSwatches'
 import { PlusIcon, TrashIcon } from '../common/Icon'
 
 const inputClass =
@@ -38,7 +39,10 @@ export function NodeEditorPanel() {
   return (
     <aside className="flex w-72 shrink-0 flex-col gap-4 overflow-y-auto border-l border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
       <div className="flex items-center justify-between">
-        <span className={`rounded px-2 py-0.5 text-[10px] font-bold tracking-wider text-white ${meta.accent}`}>
+        <span
+          className="rounded px-2 py-0.5 text-[10px] font-bold tracking-wider text-white"
+          style={{ backgroundColor: nodeColor(data) }}
+        >
           {meta.label} NODE
         </span>
         <button
@@ -102,6 +106,15 @@ export function NodeEditorPanel() {
           value={data.imageUrl ?? ''}
           placeholder="https://…"
           onChange={(e) => update({ imageUrl: e.target.value })}
+        />
+      </div>
+
+      <div>
+        <span className={labelClass}>Node color</span>
+        <ColorSwatches
+          value={data.color}
+          onChange={(color) => update({ color })}
+          defaultLabel="Type default"
         />
       </div>
 

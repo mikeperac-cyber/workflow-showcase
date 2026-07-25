@@ -6,7 +6,7 @@ import { useActiveWorkflow, useWorkflowStore } from '../../store/workflowStore'
 import { useThemeStore } from '../../store/themeStore'
 import { usePlayback } from '../../hooks/usePlayback'
 import { WorkflowNodeComponent } from '../canvas/WorkflowNode'
-import { defaultEdgeOptions } from '../canvas/shared'
+import { decorateEdge, defaultEdgeOptions } from '../canvas/shared'
 import { BackIcon, EditIcon } from '../common/Icon'
 import { ExportMenu } from '../common/ExportMenu'
 import { NodeDetailPanel } from './NodeDetailPanel'
@@ -48,7 +48,8 @@ function ShowcaseCanvas({ workflow }: { workflow: Workflow }) {
 
   const edges = useMemo<Edge[]>(
     () =>
-      workflow.edges.map((e) => {
+      workflow.edges.map((raw) => {
+        const e = decorateEdge(raw)
         const traversed = playback.visited.has(e.source) && playback.visited.has(e.target)
         const entering =
           !traversed &&
@@ -56,8 +57,12 @@ function ShowcaseCanvas({ workflow }: { workflow: Workflow }) {
           e.target === playback.currentNode?.id
         return {
           ...e,
-          animated: traversed || entering,
-          style: traversed ? TRAVERSED_STYLE : entering ? ENTERING_STYLE : undefined,
+          animated: traversed || entering || (e.animated ?? false),
+          style: traversed
+            ? { ...e.style, ...TRAVERSED_STYLE }
+            : entering
+              ? { ...e.style, ...ENTERING_STYLE }
+              : e.style,
         }
       }),
     [workflow.edges, playback.visited, playback.currentNode],

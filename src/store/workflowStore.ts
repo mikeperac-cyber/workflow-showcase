@@ -1,8 +1,15 @@
 import type { Connection, EdgeChange, NodeChange, XYPosition } from '@xyflow/react'
-import { addEdge, applyEdgeChanges, applyNodeChanges, MarkerType } from '@xyflow/react'
+import { addEdge, applyEdgeChanges, applyNodeChanges } from '@xyflow/react'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { View, Workflow, WorkflowNode, WorkflowNodeData, WorkflowNodeType } from '../types/workflow'
+import type {
+  EdgePatch,
+  View,
+  Workflow,
+  WorkflowNode,
+  WorkflowNodeData,
+  WorkflowNodeType,
+} from '../types/workflow'
 import { uid } from '../utils/id'
 import { createSampleWorkflows } from '../utils/sampleWorkflows'
 
@@ -37,6 +44,8 @@ interface WorkflowStore {
   addNode: (nodeType: WorkflowNodeType, position?: XYPosition) => void
   deleteNode: (nodeId: string) => void
   updateNodeData: (nodeId: string, patch: Partial<WorkflowNodeData>) => void
+  updateEdge: (edgeId: string, patch: EdgePatch) => void
+  deleteEdge: (edgeId: string) => void
 }
 
 function touch(wf: Workflow): Workflow {
@@ -134,17 +143,9 @@ export const useWorkflowStore = create<WorkflowStore>()(
           mutateActive((wf) => ({ ...wf, edges: applyEdgeChanges(changes, wf.edges) })),
 
         onConnect: (connection) =>
-          mutateActive((wf) => ({
-            ...wf,
-            edges: addEdge(
-              {
-                ...connection,
-                type: 'smoothstep',
-                markerEnd: { type: MarkerType.ArrowClosed },
-              },
-              wf.edges,
-            ),
-          })),
+          // Raw edge — visual props (type, markers, style) are applied at
+          // render time by decorateEdge based on edge.data options.
+          mutateActive((wf) => ({ ...wf, edges: addEdge(connection, wf.edges) })),
 
         addNode: (nodeType, position) => {
           // The new node becomes the selection (React Flow `selected` flags are
@@ -181,6 +182,29 @@ export const useWorkflowStore = create<WorkflowStore>()(
             nodes: wf.nodes.map((n) =>
               n.id === nodeId ? { ...n, data: { ...n.data, ...patch } } : n,
             ),
+          })),
+
+        updateEdge: (edgeId, patch) => {
+          const { label, animated, ...dataPatch } = patch
+          mutateActive((wf) => ({
+            ...wf,
+            edges: wf.edges.map((e) =>
+              e.id === edgeId
+                ? {
+                    ...e,
+                    ...(label !== undefined ? { label } : {}),
+                    ...(animated !== undefined ? { animated } : {}),
+                    data: { ...(e.data ?? {}), ...dataPatch },
+                  }
+                : e,
+            ),
+          }))
+        },
+
+        deleteEdge: (edgeId) =>
+          mutateActive((wf) => ({
+            ...wf,
+            edges: wf.edges.filter((e) => e.id !== edgeId),
           })),
       }
     },

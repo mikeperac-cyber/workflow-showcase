@@ -1,9 +1,6 @@
 import type { Edge } from '@xyflow/react'
-import { MarkerType } from '@xyflow/react'
-import type { Workflow, WorkflowNode, WorkflowNodeType } from '../types/workflow'
+import type { Workflow, WorkflowEdgeData, WorkflowNode, WorkflowNodeType } from '../types/workflow'
 import { uid } from './id'
-
-const arrow = { type: MarkerType.ArrowClosed }
 
 function node(
   id: string,
@@ -20,15 +17,15 @@ function node(
   }
 }
 
-function edge(id: string, source: string, target: string, label?: string): Edge {
-  return {
-    id,
-    source,
-    target,
-    label,
-    type: 'smoothstep',
-    markerEnd: arrow,
-  }
+function edge(
+  id: string,
+  source: string,
+  target: string,
+  label?: string,
+  data?: WorkflowEdgeData,
+  animated?: boolean,
+): Edge {
+  return { id, source, target, label, data, animated }
 }
 
 function orderFulfillment(): Workflow {
@@ -65,7 +62,7 @@ function orderFulfillment(): Workflow {
         label: 'Pick & Pack',
         description: 'Warehouse fulfillment',
         details: 'Warehouse staff pick items by optimized route. Each item is scanned for accuracy before packing.',
-        imageUrl: '',
+        color: '#8b5cf6',
         metrics: [{ label: 'pick accuracy', value: '99.8%' }],
       }),
       node('of-cancel', 'end', 720, 260, {
@@ -87,9 +84,13 @@ function orderFulfillment(): Workflow {
     edges: [
       edge('of-e1', 'of-start', 'of-receive'),
       edge('of-e2', 'of-receive', 'of-validate'),
-      edge('of-e3', 'of-validate', 'of-pack', 'paid'),
-      edge('of-e4', 'of-validate', 'of-cancel', 'declined'),
-      edge('of-e5', 'of-pack', 'of-ship'),
+      edge('of-e3', 'of-validate', 'of-pack', 'paid', { color: '#10b981' }),
+      edge('of-e4', 'of-validate', 'of-cancel', 'declined', {
+        color: '#f43f5e',
+        dashed: true,
+        arrowEnd: 'open',
+      }),
+      edge('of-e5', 'of-pack', 'of-ship', undefined, { color: '#8b5cf6' }, true),
       edge('of-e6', 'of-ship', 'of-end'),
     ],
   }
@@ -132,6 +133,7 @@ docker build -t app:$GIT_SHA .`,
         label: 'Deploy Staging',
         description: 'Auto-deploy + smoke tests',
         details: 'Green builds deploy to staging automatically. Synthetic smoke tests run against the live environment.',
+        color: '#06b6d4',
       }),
       node('cicd-prod', 'task', 960, 40, {
         label: 'Promote to Prod',
@@ -143,11 +145,15 @@ docker build -t app:$GIT_SHA .`,
     ],
     edges: [
       edge('cicd-e1', 'cicd-start', 'cicd-build'),
-      edge('cicd-e2', 'cicd-build', 'cicd-test'),
-      edge('cicd-e3', 'cicd-test', 'cicd-staging', 'green'),
-      edge('cicd-e4', 'cicd-test', 'cicd-fail', 'failed'),
-      edge('cicd-e5', 'cicd-staging', 'cicd-prod'),
-      edge('cicd-e6', 'cicd-prod', 'cicd-end'),
+      edge('cicd-e2', 'cicd-build', 'cicd-test', undefined, { lineStyle: 'bezier' }),
+      edge('cicd-e3', 'cicd-test', 'cicd-staging', 'green', { color: '#10b981' }),
+      edge('cicd-e4', 'cicd-test', 'cicd-fail', 'failed', {
+        color: '#f43f5e',
+        dashed: true,
+        arrowEnd: 'open',
+      }),
+      edge('cicd-e5', 'cicd-staging', 'cicd-prod', undefined, { color: '#06b6d4' }),
+      edge('cicd-e6', 'cicd-prod', 'cicd-end', undefined, { arrowStart: 'open' }),
     ],
   }
 }
