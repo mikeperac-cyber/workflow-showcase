@@ -1,3 +1,4 @@
+import { memo, useMemo, useState } from 'react'
 import type { Workflow } from '../../types/workflow'
 import { useWorkflowStore } from '../../store/workflowStore'
 import { CopyIcon, EditIcon, PlusIcon, PresentIcon, TrashIcon } from '../common/Icon'
@@ -10,18 +11,63 @@ function formatDate(timestamp: number): string {
   })
 }
 
-function WorkflowCard({ workflow }: { workflow: Workflow }) {
+/** Left-border accent color keyed to workflow category. */
+function categoryBorderColor(category?: string): string {
+  if (category === 'ai')    return '#8b5cf6'  // violet
+  if (category === 'ielts') return '#3b82f6'  // blue
+  if (category === 'esl')   return '#10b981'  // emerald
+  return '#64748b'                            // slate (custom)
+}
+
+/** Category pill label and color classes. */
+function CategoryPill({ category }: { category?: string }) {
+  if (!category) return null
+  const label = category === 'ai' ? 'AI' : category === 'ielts' ? 'IELTS' : category === 'esl' ? 'ESL' : 'Custom'
+  const cls =
+    category === 'ai'
+      ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300'
+      : category === 'ielts'
+        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+        : category === 'esl'
+          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+          : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider ${cls}`}>
+      {label}
+    </span>
+  )
+}
+
+const WorkflowCard = memo(function WorkflowCard({ workflow }: { workflow: Workflow }) {
   const openBuilder = useWorkflowStore((s) => s.openBuilder)
   const openShowcase = useWorkflowStore((s) => s.openShowcase)
   const duplicateWorkflow = useWorkflowStore((s) => s.duplicateWorkflow)
   const deleteWorkflow = useWorkflowStore((s) => s.deleteWorkflow)
 
   return (
-    <div className="flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
-      <h3 className="font-semibold leading-snug">{workflow.name}</h3>
+    <div
+      className="flex flex-col rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-gray-800 dark:bg-gray-900"
+      style={{ borderLeftWidth: 4, borderLeftColor: categoryBorderColor(workflow.category) }}
+    >
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="font-semibold leading-snug">{workflow.name}</h3>
+        <CategoryPill category={workflow.category} />
+      </div>
       <p className="mt-1 line-clamp-2 min-h-5 text-sm text-gray-500 dark:text-gray-400">
         {workflow.description || 'No description'}
       </p>
+      {workflow.tags && workflow.tags.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {workflow.tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
       <p className="mt-2 text-xs text-gray-400 dark:text-gray-500">
         {workflow.nodes.length} {workflow.nodes.length === 1 ? 'node' : 'nodes'} · updated{' '}
         {formatDate(workflow.updatedAt)}
@@ -65,14 +111,41 @@ function WorkflowCard({ workflow }: { workflow: Workflow }) {
       </div>
     </div>
   )
-}
+})
+
+const CATEGORY_FILTERS = [
+  { label: 'All', value: '' },
+  { label: 'AI', value: 'ai' },
+  { label: 'IELTS', value: 'ielts' },
+  { label: 'ESL', value: 'esl' },
+  { label: 'Custom', value: 'custom' },
+] as const
 
 export function LibraryView() {
   const workflows = useWorkflowStore((s) => s.workflows)
   const createWorkflow = useWorkflowStore((s) => s.createWorkflow)
   const openBuilder = useWorkflowStore((s) => s.openBuilder)
 
-  const sorted = Object.values(workflows).sort((a, b) => b.updatedAt - a.updatedAt)
+  const [search, setSearch] = useState('')
+  const [activeCategory, setActiveCategory] = useState<'' | 'ai' | 'ielts' | 'esl' | 'custom'>('')
+
+  const sorted = useMemo(
+    () => Object.values(workflows).sort((a, b) => b.updatedAt - a.updatedAt),
+    [workflows],
+  )
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim()
+    return sorted.filter((wf) => {
+      const matchesSearch =
+        !q ||
+        wf.name.toLowerCase().includes(q) ||
+        wf.description.toLowerCase().includes(q) ||
+        wf.tags?.some((t) => t.toLowerCase().includes(q))
+      const matchesCategory = !activeCategory || wf.category === activeCategory || (!wf.category && activeCategory === 'custom')
+      return matchesSearch && matchesCategory
+    })
+  }, [sorted, search, activeCategory])
 
   const handleCreate = () => {
     const id = createWorkflow()
@@ -85,7 +158,7 @@ export function LibraryView() {
         <div>
           <h1 className="text-2xl font-bold">Your workflows</h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Build a workflow, then present it as an animated walkthrough.
+            Build an IELTS or ESL workflow, then present it as an animated walkthrough.
           </p>
         </div>
         <button
@@ -97,20 +170,63 @@ export function LibraryView() {
         </button>
       </div>
 
-      {sorted.length === 0 ? (
+      {/* Search + Filter Bar */}
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        <input
+          type="search"
+          placeholder="Search by name, description, or tag…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="h-9 min-w-56 flex-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-500 dark:focus:ring-blue-900"
+        />
+        <div className="flex gap-1">
+          {CATEGORY_FILTERS.map((f) => (
+            <button
+              key={f.value}
+              type="button"
+              onClick={() => setActiveCategory(f.value as typeof activeCategory)}
+              className={[
+                'rounded-full px-3 py-1 text-xs font-semibold transition',
+                activeCategory === f.value
+                  ? 'bg-blue-600 text-white'
+                  : 'border border-gray-300 text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800',
+              ].join(' ')}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-gray-300 py-20 text-center dark:border-gray-700">
-          <p className="text-gray-500 dark:text-gray-400">No workflows yet.</p>
-          <button
-            type="button"
-            onClick={handleCreate}
-            className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
-          >
-            <PlusIcon /> Create your first workflow
-          </button>
+          {sorted.length === 0 ? (
+            <>
+              <p className="text-gray-500 dark:text-gray-400">No workflows yet.</p>
+              <button
+                type="button"
+                onClick={handleCreate}
+                className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+              >
+                <PlusIcon /> Create your first workflow
+              </button>
+            </>
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400">
+              No workflows match your search.{' '}
+              <button
+                type="button"
+                onClick={() => { setSearch(''); setActiveCategory('') }}
+                className="text-blue-600 underline-offset-2 hover:underline dark:text-blue-400"
+              >
+                Clear filters
+              </button>
+            </p>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sorted.map((wf) => (
+          {filtered.map((wf) => (
             <WorkflowCard key={wf.id} workflow={wf} />
           ))}
         </div>

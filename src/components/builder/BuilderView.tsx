@@ -15,6 +15,14 @@ import { DND_MIME, NodePalette } from './NodePalette'
 
 const nodeTypes: NodeTypes = { workflow: WorkflowNodeComponent }
 
+/** Category selector pills shown in the toolbar. */
+const CATEGORIES = [
+  { label: 'AI', value: 'ai' },
+  { label: 'IELTS', value: 'ielts' },
+  { label: 'ESL', value: 'esl' },
+  { label: 'Custom', value: 'custom' },
+] as const
+
 function BuilderToolbar({ workflow }: { workflow: Workflow }) {
   const goLibrary = useWorkflowStore((s) => s.goLibrary)
   const openShowcase = useWorkflowStore((s) => s.openShowcase)
@@ -46,6 +54,31 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
           className="w-64 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm outline-none transition focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800"
           aria-label="Workflow description"
         />
+        {/* Category selector */}
+        <div className="flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2 py-1 dark:border-gray-700 dark:bg-gray-800">
+          <span className="text-xs text-gray-400 dark:text-gray-500">Cat:</span>
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.value}
+              type="button"
+              onClick={() => updateWorkflowMeta(workflow.id, { category: cat.value })}
+              className={[
+                'rounded px-2 py-0.5 text-[10px] font-bold transition',
+                workflow.category === cat.value
+                  ? cat.value === 'ai'
+                    ? 'bg-violet-600 text-white'
+                    : cat.value === 'ielts'
+                      ? 'bg-blue-600 text-white'
+                      : cat.value === 'esl'
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-gray-600 text-white'
+                  : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700',
+              ].join(' ')}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="pointer-events-auto flex items-center gap-2">
         {selectedNodeId && (

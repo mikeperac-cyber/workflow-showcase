@@ -1,6 +1,15 @@
 import type { Edge, Node } from '@xyflow/react'
 
-export type WorkflowNodeType = 'start' | 'task' | 'decision' | 'end'
+export type WorkflowNodeType =
+  | 'start'
+  | 'task'
+  | 'decision'
+  | 'end'
+  | 'note'
+  | 'agent'
+  | 'llm-model'
+  | 'tool'
+  | 'prompt'
 
 export type PlaybackStatus = 'upcoming' | 'active' | 'done'
 
@@ -25,6 +34,26 @@ export interface WorkflowNodeData extends Record<string, unknown> {
   color?: string
   /** Transient playback state injected by the showcase view (never persisted meaningfully). */
   playback?: PlaybackStatus
+
+  // ── Specialized AI Node Fields ──────────────────────────────────────
+  /** Agent role or system prompt instructions (for 'agent') */
+  systemInstructions?: string
+  /** Model identifier, e.g. 'gpt-4o', 'claude-3-5-sonnet', 'gemini-1.5-pro' (for 'llm-model' & 'agent') */
+  model?: string
+  /** Sampling temperature 0.0 - 2.0 (for 'llm-model') */
+  temperature?: number
+  /** Maximum generation tokens (for 'llm-model') */
+  maxTokens?: number
+  /** Function or tool signature/interface (for 'tool') */
+  functionSignature?: string
+  /** Target API endpoint or tool service URL (for 'tool') */
+  apiEndpoint?: string
+  /** HTTP method or execution type (for 'tool') */
+  httpMethod?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'RPC'
+  /** System message template (for 'prompt') */
+  systemPrompt?: string
+  /** User message template with variables (for 'prompt') */
+  userPrompt?: string
 }
 
 export type EdgeLineStyle = 'smooth' | 'bezier' | 'straight' | 'step'
@@ -59,6 +88,10 @@ export interface Workflow {
   edges: Edge[]
   createdAt: number
   updatedAt: number
+  /** Topic tags for filtering in the library, e.g. ['ielts', 'writing']. */
+  tags?: string[]
+  /** High-level category shown as a color accent on library cards. */
+  category?: 'ai' | 'ielts' | 'esl' | 'custom'
 }
 
 export type View = 'library' | 'builder' | 'showcase'

@@ -7,10 +7,15 @@ export const PLAYBACK_SPEEDS = [0.5, 1, 2] as const
  * BFS traversal from the `start` node along edges.
  * Disconnected nodes are appended at the end so every node gets showcased.
  */
-export function computeTraversal(workflow: Workflow): string[] {
+function computeTraversalParts(workflow: Pick<Workflow, 'nodes' | 'edges'>): string[] {
   const adjacency = new Map<string, string[]>()
   for (const e of workflow.edges) {
-    adjacency.set(e.source, [...(adjacency.get(e.source) ?? []), e.target])
+    const targets = adjacency.get(e.source)
+    if (targets) {
+      targets.push(e.target)
+    } else {
+      adjacency.set(e.source, [e.target])
+    }
   }
 
   const startNode = workflow.nodes.find((n) => n.data.nodeType === 'start') ?? workflow.nodes[0]
@@ -19,8 +24,9 @@ export function computeTraversal(workflow: Workflow): string[] {
 
   if (startNode) {
     const queue = [startNode.id]
-    while (queue.length > 0) {
-      const id = queue.shift()!
+    let queueIndex = 0
+    while (queueIndex < queue.length) {
+      const id = queue[queueIndex++]
       if (seen.has(id)) continue
       seen.add(id)
       order.push(id)
@@ -39,6 +45,10 @@ export function computeTraversal(workflow: Workflow): string[] {
   return order
 }
 
+export function computeTraversal(workflow: Workflow): string[] {
+  return computeTraversalParts(workflow)
+}
+
 export interface Playback {
   steps: string[]
   currentIndex: number
@@ -55,7 +65,14 @@ export interface Playback {
 }
 
 export function usePlayback(workflow: Workflow): Playback {
-  const steps = useMemo(() => computeTraversal(workflow), [workflow])
+  const steps = useMemo(
+    () => computeTraversalParts({ nodes: workflow.nodes, edges: workflow.edges }),
+    [workflow.nodes, workflow.edges],
+  )
+  const nodesById = useMemo(
+    () => new Map(workflow.nodes.map((node) => [node.id, node] as const)),
+    [workflow.nodes],
+  )
   const [currentIndex, setCurrentIndex] = useState(-1)
   const [isPlaying, setIsPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
@@ -67,20 +84,26 @@ export function usePlayback(workflow: Workflow): Playback {
   }, [workflow.id])
 
   useEffect(() => {
+    if (currentIndex < steps.length) return
+    setCurrentIndex(Math.max(-1, steps.length - 1))
+    setIsPlaying(false)
+  }, [currentIndex, steps.length])
+
+  useEffect(() => {
     if (!isPlaying) return
     if (currentIndex >= steps.length - 1) {
       setIsPlaying(false)
       return
     }
     const nextId = steps[currentIndex + 1]
-    const node = workflow.nodes.find((n) => n.id === nextId)
+    const node = nodesById.get(nextId)
     const dwell = (node?.data.duration ?? 2000) / speed
     const timer = setTimeout(
       () => setCurrentIndex((i) => Math.min(i + 1, steps.length - 1)),
       dwell,
     )
     return () => clearTimeout(timer)
-  }, [isPlaying, currentIndex, speed, steps, workflow.nodes])
+  }, [isPlaying, currentIndex, speed, steps, nodesById])
 
   const visited = useMemo(
     () => new Set(steps.slice(0, Math.max(0, currentIndex + 1))),
@@ -89,7 +112,7 @@ export function usePlayback(workflow: Workflow): Playback {
 
   const currentNodeId = currentIndex >= 0 ? steps[currentIndex] : null
   const currentNode = currentNodeId
-    ? (workflow.nodes.find((n) => n.id === currentNodeId) ?? null)
+    ? (nodesById.get(currentNodeId) ?? null)
     : null
 
   return {

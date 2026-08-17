@@ -12,6 +12,11 @@ export const NODE_TYPE_META: Record<WorkflowNodeType, { label: string; hex: stri
   task: { label: 'STEP', hex: '#3b82f6', accent: 'bg-blue-500' },
   decision: { label: 'IF', hex: '#f59e0b', accent: 'bg-amber-500' },
   end: { label: 'END', hex: '#f43f5e', accent: 'bg-rose-500' },
+  note: { label: 'NOTE', hex: '#eab308', accent: 'bg-yellow-500' },
+  agent: { label: 'AGENT', hex: '#8b5cf6', accent: 'bg-violet-500' },
+  'llm-model': { label: 'MODEL', hex: '#06b6d4', accent: 'bg-cyan-500' },
+  tool: { label: 'TOOL', hex: '#f97316', accent: 'bg-orange-500' },
+  prompt: { label: 'PROMPT', hex: '#ec4899', accent: 'bg-pink-500' },
 }
 
 /** Shared color palette for node accents and edge strokes. */
@@ -24,6 +29,7 @@ export const COLOR_PALETTE = [
   { name: 'Violet', value: '#8b5cf6' },
   { name: 'Cyan', value: '#06b6d4' },
   { name: 'Orange', value: '#f97316' },
+  { name: 'Pink', value: '#ec4899' },
 ]
 
 /** Effective accent color of a node: custom override or its type default. */

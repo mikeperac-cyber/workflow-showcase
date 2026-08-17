@@ -1,4 +1,3 @@
-import { toPng, toSvg } from 'html-to-image'
 import { getNodesBounds, getViewportForBounds } from '@xyflow/react'
 import type { WorkflowNode } from '../types/workflow'
 
@@ -27,6 +26,7 @@ export async function exportFlowImage(
 
   const bounds = getNodesBounds(nodes)
   const viewport = getViewportForBounds(bounds, IMAGE_WIDTH, IMAGE_HEIGHT, 0.5, 2, 0.15)
+  const { toPng, toSvg } = await import('html-to-image')
   const render = kind === 'png' ? toPng : toSvg
 
   const dataUrl = await render(viewportEl, {

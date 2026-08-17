@@ -18,6 +18,11 @@ const DEFAULT_NODE_LABELS: Record<WorkflowNodeType, string> = {
   task: 'New Step',
   decision: 'Decision',
   end: 'End',
+  note: '📝 Note',
+  agent: 'AI Agent',
+  'llm-model': 'LLM Model',
+  tool: 'Tool / API',
+  prompt: 'Prompt Template',
 }
 
 interface WorkflowStore {
@@ -34,7 +39,7 @@ interface WorkflowStore {
   createWorkflow: () => string
   deleteWorkflow: (id: string) => void
   duplicateWorkflow: (id: string) => void
-  updateWorkflowMeta: (id: string, patch: Partial<Pick<Workflow, 'name' | 'description'>>) => void
+  updateWorkflowMeta: (id: string, patch: Partial<Pick<Workflow, 'name' | 'description' | 'tags' | 'category'>>) => void
   importWorkflow: (wf: Workflow) => string
 
   // canvas interactions (builder)
