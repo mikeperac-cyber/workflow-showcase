@@ -2,7 +2,7 @@ import type { DragEvent } from 'react'
 import { useMemo } from 'react'
 import type { NodeTypes } from '@xyflow/react'
 import { Background, Controls, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
-import type { Workflow, WorkflowNodeType } from '../../types/workflow'
+import type { Workflow, WorkflowNodeType, WorkflowNode } from '../../types/workflow'
 import { useActiveWorkflow, useSelectedNodeId, useWorkflowStore } from '../../store/workflowStore'
 import { useThemeStore } from '../../store/themeStore'
 import { WorkflowNodeComponent } from '../canvas/WorkflowNode'
@@ -34,7 +34,7 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
   const updateWorkflowMeta = useWorkflowStore((s) => s.updateWorkflowMeta)
   const selectedNodeId = useSelectedNodeId()
   const deleteNode = useWorkflowStore((s) => s.deleteNode)
-  const { setNodes, getNodes, getEdges, fitView } = useReactFlow()
+  const { setNodes, getNodes, getEdges, fitView } = useReactFlow<WorkflowNode>()
 
   const handleAutoLayout = () => {
     const layoutedNodes = getAutoLayoutNodes(getNodes(), getEdges(), 'TB')
