@@ -2,7 +2,7 @@ import type { DragEvent } from 'react'
 import { useMemo } from 'react'
 import type { NodeTypes } from '@xyflow/react'
 import { Background, Controls, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
-import type { Workflow, WorkflowNodeType } from '../../types/workflow'
+import type { Workflow, WorkflowNodeType, WorkflowNode } from '../../types/workflow'
 import { useActiveWorkflow, useSelectedNodeId, useWorkflowStore } from '../../store/workflowStore'
 import { useThemeStore } from '../../store/themeStore'
 import { WorkflowNodeComponent } from '../canvas/WorkflowNode'
@@ -19,6 +19,10 @@ const nodeTypes: NodeTypes = { workflow: WorkflowNodeComponent }
 /** Category selector pills shown in the toolbar. */
 const CATEGORIES = [
   { label: 'AI', value: 'ai' },
+  { label: 'Productivity', value: 'productivity' },
+  { label: 'Business', value: 'business' },
+  { label: 'Student', value: 'student' },
+  { label: 'Teacher', value: 'teacher' },
   { label: 'IELTS', value: 'ielts' },
   { label: 'ESL', value: 'esl' },
   { label: 'Custom', value: 'custom' },
@@ -30,7 +34,7 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
   const updateWorkflowMeta = useWorkflowStore((s) => s.updateWorkflowMeta)
   const selectedNodeId = useSelectedNodeId()
   const deleteNode = useWorkflowStore((s) => s.deleteNode)
-  const { setNodes, getNodes, getEdges, fitView } = useReactFlow()
+  const { setNodes, getNodes, getEdges, fitView } = useReactFlow<WorkflowNode>()
 
   const handleAutoLayout = () => {
     const layoutedNodes = getAutoLayoutNodes(getNodes(), getEdges(), 'TB')
@@ -75,6 +79,14 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
                 workflow.category === cat.value
                   ? cat.value === 'ai'
                     ? 'bg-violet-600 text-white'
+                    : cat.value === 'productivity'
+                      ? 'bg-orange-600 text-white'
+                    : cat.value === 'business'
+                      ? 'bg-amber-600 text-white'
+                    : cat.value === 'student'
+                      ? 'bg-cyan-600 text-white'
+                    : cat.value === 'teacher'
+                      ? 'bg-pink-600 text-white'
                     : cat.value === 'ielts'
                       ? 'bg-blue-600 text-white'
                       : cat.value === 'esl'

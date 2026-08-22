@@ -41,7 +41,7 @@ const VALID_NODE_TYPES: Set<WorkflowNodeType> = new Set([
   'prompt',
 ])
 
-const VALID_CATEGORIES = new Set(['ai', 'ielts', 'esl', 'custom'])
+const VALID_CATEGORIES = new Set(['ai', 'ielts', 'esl', 'productivity', 'business', 'student', 'teacher', 'custom'])
 
 class TestRunner {
   private results: TestResult[] = []
@@ -220,22 +220,33 @@ export function runWorkflowVerification(): boolean {
 
   // ─── Suite 1: Sample Workflows Registration & Count ────────────────────────
   runner.suite('1. Sample Workflows Registration & Count', () => {
-    runner.test('createSampleWorkflows returns exactly 9 sample workflows', () => {
+    runner.test('createSampleWorkflows returns exactly 19 sample workflows', () => {
       runner.assertEqual(
         workflows.length,
-        9,
-        'Expected exactly 9 workflows (6 IELTS/ESL + 3 AI workflows)',
+        19,
+        'Expected exactly 19 workflows',
       )
     })
 
-    runner.test('Category breakdown has exactly 3 AI, 4 IELTS, and 2 ESL workflows', () => {
-      const aiWorkflows = workflows.filter((w) => w.category === 'ai')
-      const ieltsWorkflows = workflows.filter((w) => w.category === 'ielts')
-      const eslWorkflows = workflows.filter((w) => w.category === 'esl')
+    runner.test('Category breakdown has exactly 3 AI, 4 IELTS, 2 ESL, 3 Productivity, 3 Business, 2 Student, and 2 Teacher workflows', () => {
+      const ai = workflows.filter((w) => w.category === 'ai')
+      const ielts = workflows.filter((w) => w.category === 'ielts')
+      const esl = workflows.filter((w) => w.category === 'esl')
+      const prod = workflows.filter((w) => w.category === 'productivity')
+      const bus = workflows.filter((w) => w.category === 'business')
+      const stu = workflows.filter((w) => w.category === 'student')
+      const teach = workflows.filter((w) => w.category === 'teacher')
 
-      runner.assertEqual(aiWorkflows.length, 3, 'Expected 3 AI workflows')
-      runner.assertEqual(ieltsWorkflows.length, 4, 'Expected 4 IELTS workflows')
-      runner.assertEqual(eslWorkflows.length, 2, 'Expected 2 ESL workflows')
+      runner.assert(
+        ai.length === 3 &&
+        ielts.length === 4 &&
+        esl.length === 2 &&
+        prod.length === 3 &&
+        bus.length === 3 &&
+        stu.length === 2 &&
+        teach.length === 2,
+        `Expected [3, 4, 2, 3, 3, 2, 2] split, got AI:${ai.length}, IELTS:${ielts.length}, ESL:${esl.length}, PROD:${prod.length}, BUS:${bus.length}, STU:${stu.length}, TEACH:${teach.length}`
+      )
     })
 
     runner.test('Workflow IDs are unique and non-empty', () => {
@@ -309,7 +320,7 @@ export function runWorkflowVerification(): boolean {
 
   // ─── Suite 3: Node Types & Specialized AI Configurations ───────────────────
   runner.suite('3. Node Types & Specialized AI Configurations', () => {
-    runner.test('All nodes in all 9 workflows have valid nodeType values', () => {
+    runner.test('All nodes in all 19 workflows have valid nodeType values', () => {
       for (const w of workflows) {
         for (const n of w.nodes) {
           runner.assert(
@@ -500,7 +511,7 @@ export function runWorkflowVerification(): boolean {
 
   // ─── Suite 5: Metadata, Metrics & Content Completeness ─────────────────────
   runner.suite('5. Metadata, Metrics & Content Completeness', () => {
-    runner.test('All 9 workflows have complete metadata (name, description, category, tags)', () => {
+    runner.test('All 19 workflows have complete metadata (name, description, category, tags)', () => {
       for (const w of workflows) {
         runner.assert(typeof w.name === 'string' && w.name.trim().length > 0, `Workflow name must be non-empty (${w.id})`)
         runner.assert(
@@ -509,7 +520,7 @@ export function runWorkflowVerification(): boolean {
         )
         runner.assert(
           VALID_CATEGORIES.has(w.category || ''),
-          `Workflow category must be one of [ai, ielts, esl, custom] (${w.name}, got ${w.category})`,
+          `Workflow category must be one of [ai, ielts, esl, productivity, business, student, teacher, custom] (${w.name}, got ${w.category})`,
         )
         runner.assert(
           Array.isArray(w.tags) && w.tags.length > 0,
