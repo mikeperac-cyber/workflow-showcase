@@ -57,7 +57,10 @@ export function WorkflowNodeComponent({ data, selected }: NodeProps<WorkflowNode
           boxShadow: '2px 4px 8px rgba(0,0,0,0.18), -1px -1px 0 rgba(0,0,0,0.06)',
         }}
       >
-        <Handle type="target" position={Position.Top} style={{ opacity: 0.4 }} />
+        <Handle type="target" position={Position.Top} id="top-target" style={{ opacity: 0.4 }} />
+        <Handle type="target" position={Position.Left} id="left-target" style={{ opacity: 0.4 }} />
+        <Handle type="target" position={Position.Right} id="right-target" style={{ opacity: 0.4 }} />
+        <Handle type="target" position={Position.Bottom} id="bottom-target" style={{ opacity: 0.4 }} />
         {/* Pin / tape element */}
         <div
           className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-yellow-500 bg-yellow-300"
@@ -71,7 +74,10 @@ export function WorkflowNodeComponent({ data, selected }: NodeProps<WorkflowNode
             {data.description}
           </div>
         )}
-        <Handle type="source" position={Position.Bottom} style={{ opacity: 0.4 }} />
+        <Handle type="source" position={Position.Top} id="top-source" style={{ opacity: 0.4 }} />
+        <Handle type="source" position={Position.Left} id="left-source" style={{ opacity: 0.4 }} />
+        <Handle type="source" position={Position.Right} id="right-source" style={{ opacity: 0.4 }} />
+        <Handle type="source" position={Position.Bottom} id="bottom-source" style={{ opacity: 0.4 }} />
       </div>
     )
   }
@@ -87,7 +93,10 @@ export function WorkflowNodeComponent({ data, selected }: NodeProps<WorkflowNode
       ].join(' ')}
       style={{ borderColor: color }}
     >
-      <Handle type="target" position={Position.Top} />
+      <Handle type="target" position={Position.Top} id="top-target" className="w-3 h-3" />
+      <Handle type="target" position={Position.Left} id="left-target" className="w-3 h-3" />
+      <Handle type="target" position={Position.Right} id="right-target" className="w-3 h-3" />
+      <Handle type="target" position={Position.Bottom} id="bottom-target" className="w-3 h-3" />
       <div className="flex items-center justify-between gap-1.5">
         <div className="flex items-center gap-1.5 overflow-hidden">
           <span
@@ -135,7 +144,10 @@ export function WorkflowNodeComponent({ data, selected }: NodeProps<WorkflowNode
           {data.userPrompt}
         </div>
       )}
-      <Handle type="source" position={Position.Bottom} />
+      <Handle type="source" position={Position.Top} id="top-source" className="w-3 h-3 !bg-blue-500" />
+      <Handle type="source" position={Position.Left} id="left-source" className="w-3 h-3 !bg-blue-500" />
+      <Handle type="source" position={Position.Right} id="right-source" className="w-3 h-3 !bg-blue-500" />
+      <Handle type="source" position={Position.Bottom} id="bottom-source" className="w-3 h-3 !bg-blue-500" />
     </div>
   )
 }
