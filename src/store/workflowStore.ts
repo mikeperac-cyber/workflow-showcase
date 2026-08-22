@@ -217,7 +217,16 @@ export const useWorkflowStore = create<WorkflowStore>()(
     },
     {
       name: 'wf-showcase-workflows',
+      version: 2,
       partialize: (s) => ({ workflows: s.workflows }),
+      migrate: (persistedState: any, version: number) => {
+          if (version === 0 || version === 1) {
+              // If migrating from old version, just clear it and load the new samples.
+              // Alternatively, we can return the fresh samples.
+              return { workflows: createSampleWorkflows() }
+          }
+          return persistedState
+      }
     },
   ),
 )
