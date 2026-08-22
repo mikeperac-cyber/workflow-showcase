@@ -19,6 +19,10 @@ const nodeTypes: NodeTypes = { workflow: WorkflowNodeComponent }
 /** Category selector pills shown in the toolbar. */
 const CATEGORIES = [
   { label: 'AI', value: 'ai' },
+  { label: 'Productivity', value: 'productivity' },
+  { label: 'Business', value: 'business' },
+  { label: 'Student', value: 'student' },
+  { label: 'Teacher', value: 'teacher' },
   { label: 'IELTS', value: 'ielts' },
   { label: 'ESL', value: 'esl' },
   { label: 'Custom', value: 'custom' },
@@ -75,6 +79,14 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
                 workflow.category === cat.value
                   ? cat.value === 'ai'
                     ? 'bg-violet-600 text-white'
+                    : cat.value === 'productivity'
+                      ? 'bg-orange-600 text-white'
+                    : cat.value === 'business'
+                      ? 'bg-amber-600 text-white'
+                    : cat.value === 'student'
+                      ? 'bg-cyan-600 text-white'
+                    : cat.value === 'teacher'
+                      ? 'bg-pink-600 text-white'
                     : cat.value === 'ielts'
                       ? 'bg-blue-600 text-white'
                       : cat.value === 'esl'

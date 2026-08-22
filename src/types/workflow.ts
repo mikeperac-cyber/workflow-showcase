@@ -91,7 +91,7 @@ export interface Workflow {
   /** Topic tags for filtering in the library, e.g. ['ielts', 'writing']. */
   tags?: string[]
   /** High-level category shown as a color accent on library cards. */
-  category?: 'ai' | 'ielts' | 'esl' | 'custom'
+  category?: 'ai' | 'ielts' | 'esl' | 'productivity' | 'business' | 'student' | 'teacher' | 'custom'
 }
 
 export type View = 'library' | 'builder' | 'showcase'

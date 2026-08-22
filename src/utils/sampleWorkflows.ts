@@ -1120,6 +1120,330 @@ Include: Summary, step-by-step resolution, and action items.`,
   }
 }
 
+
+// ─── 10. GTD Weekly Review ────────────────────────────────────────────────
+export function gtdReview(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'GTD Weekly Review Pipeline',
+    description: 'A structured Getting Things Done (GTD) weekly review to clear your mind, organize tasks, and plan the week ahead.',
+    category: 'productivity',
+    tags: ['productivity', 'gtd', 'planning', 'organization'],
+    createdAt: now,
+    updatedAt: now,
+    nodes: [
+      node('gtd-1', 'start', 0, 0, { label: 'Clear the Deck', description: 'Empty your physical and digital inboxes', details: 'Gather all loose papers, receipts, and notes. Process your email inbox to zero. Move everything into your trusted system.' }),
+      node('gtd-2', 'task', 0, 150, { label: 'Mind Sweep', description: 'Write down everything on your mind', details: 'Do a brain dump. Write down every idea, task, and commitment that is taking up mental space. Do not process them yet, just capture.' }),
+      node('gtd-3', 'task', 0, 300, { label: 'Review Next Actions', description: 'Update your action lists', details: 'Go through your Next Actions lists. Cross off completed items. Move items that require waiting to the Waiting For list.' }),
+      node('gtd-4', 'decision', 0, 450, { label: 'Project Review', description: 'Are all projects moving forward?', details: 'Review your active projects list. Ensure every project has at least one current Next Action.' }),
+      node('gtd-5a', 'task', -150, 600, { label: 'Add Next Actions', description: 'Create actions for stalled projects', details: 'Break down the stalled project into the very next physical, visible action required to move it forward.' }),
+      node('gtd-5b', 'task', 150, 600, { label: 'Review Someday/Maybe', description: 'Check your someday/maybe list', details: 'Review projects you put on hold. Are any of them ready to become active?' }),
+      node('gtd-6', 'end', 0, 750, { label: 'Weekly Plan Set', description: 'Ready for the week', details: 'Your system is clear, current, and complete. You are ready to execute with a clear mind.' })
+    ],
+    edges: [
+      edge('e-gtd1', 'gtd-1', 'gtd-2'),
+      edge('e-gtd2', 'gtd-2', 'gtd-3'),
+      edge('e-gtd3', 'gtd-3', 'gtd-4'),
+      edge('e-gtd4a', 'gtd-4', 'gtd-5a', 'Needs action', { color: '#f59e0b' }),
+      edge('e-gtd4b', 'gtd-4', 'gtd-5b', 'Looks good', { color: '#10b981' }),
+      edge('e-gtd5a', 'gtd-5a', 'gtd-5b', undefined, { dashed: true }),
+      edge('e-gtd5b', 'gtd-5b', 'gtd-6')
+    ]
+  }
+}
+
+// ─── 11. Deep Work Sprint ────────────────────────────────────────────────
+export function deepWorkSprint(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Deep Work Sprint Manager',
+    description: 'A 90-minute focused work sprint system to maximize concentration and output.',
+    category: 'productivity',
+    tags: ['productivity', 'deep-work', 'focus', 'time-management'],
+    createdAt: now,
+    updatedAt: now,
+    nodes: [
+      node('dw-1', 'start', 0, 0, { label: 'Define the Goal', description: 'Set a singular, clear objective', details: 'What is the ONE thing you must accomplish in this 90-minute block? Write it down.' }),
+      node('dw-2', 'task', 0, 150, { label: 'Eliminate Distractions', description: 'Zero interruptions', details: 'Close all non-essential tabs. Put your phone in another room or on airplane mode. Turn on website blockers.' }),
+      node('dw-3', 'task', 0, 300, { label: '90-Min Sprint', description: 'Execute the work', details: 'Work continuously on the single objective. If you get distracted, gently bring your focus back to the task.', duration: 5000 }),
+      node('dw-4', 'decision', 0, 450, { label: 'Sprint Complete?', description: 'Did you finish the objective?', details: 'Assess your progress after 90 minutes.' }),
+      node('dw-5a', 'task', -150, 600, { label: 'Capture Remaining', description: 'Note what is left', details: 'Write down exactly where you left off so you can easily resume in the next sprint.' }),
+      node('dw-5b', 'task', 150, 600, { label: 'Celebrate', description: 'Acknowledge the win', details: 'Take a moment to appreciate the focused effort and the completion of the task.' }),
+      node('dw-6', 'end', 0, 750, { label: '20-Min Recovery', description: 'Rest and recharge', details: 'Step away from the screen. Walk, stretch, or grab water. Let your brain rest before the next sprint.' })
+    ],
+    edges: [
+      edge('e-dw1', 'dw-1', 'dw-2'),
+      edge('e-dw2', 'dw-2', 'dw-3'),
+      edge('e-dw3', 'dw-3', 'dw-4'),
+      edge('e-dw4a', 'dw-4', 'dw-5a', 'Unfinished', { color: '#f59e0b' }),
+      edge('e-dw4b', 'dw-4', 'dw-5b', 'Finished', { color: '#10b981' }),
+      edge('e-dw5a', 'dw-5a', 'dw-6'),
+      edge('e-dw5b', 'dw-5b', 'dw-6')
+    ]
+  }
+}
+
+// ─── 12. Local Business Setup ──────────────────────────────────────────────
+export function localBusinessSetup(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Small/Local Business Setup',
+    description: 'A step-by-step guide to legally establishing and launching a local business.',
+    category: 'business',
+    tags: ['business', 'startup', 'local', 'legal', 'launch'],
+    createdAt: now,
+    updatedAt: now,
+    nodes: [
+      node('lb-1', 'start', 0, 0, { label: 'Business Plan', description: 'Define value prop & target audience', details: 'Outline your services, target market, competitive advantage, and initial financial projections.' }),
+      node('lb-2', 'task', 0, 150, { label: 'Register Entity', description: 'LLC, Sole Prop, or Corp', details: 'Choose a business structure and register your business name with the state.' }),
+      node('lb-3', 'task', 0, 300, { label: 'Obtain EIN & Licenses', description: 'Federal and local compliance', details: 'Apply for an Employer Identification Number (EIN) from the IRS and acquire necessary local city/county permits.' }),
+      node('lb-4', 'decision', 0, 450, { label: 'Physical Location?', description: 'Do you need a storefront?', details: 'Decide if your business requires a physical retail or office space.' }),
+      node('lb-5a', 'task', -150, 600, { label: 'Lease & Outfitting', description: 'Secure and prep space', details: 'Sign a commercial lease, obtain insurance, and renovate the space for operations.' }),
+      node('lb-5b', 'task', 150, 600, { label: 'Digital Presence', description: 'Website & Google My Business', details: 'Set up a professional website, social media profiles, and claim your Google My Business listing.' }),
+      node('lb-6', 'end', 0, 750, { label: 'Soft Launch', description: 'Open doors to beta customers', details: 'Launch with a limited audience to test operations, gather feedback, and iron out bugs before the grand opening.' })
+    ],
+    edges: [
+      edge('e-lb1', 'lb-1', 'lb-2'),
+      edge('e-lb2', 'lb-2', 'lb-3'),
+      edge('e-lb3', 'lb-3', 'lb-4'),
+      edge('e-lb4a', 'lb-4', 'lb-5a', 'Yes', { color: '#3b82f6' }),
+      edge('e-lb4b', 'lb-4', 'lb-5b', 'No (Online/Mobile)', { color: '#8b5cf6' }),
+      edge('e-lb5a', 'lb-5a', 'lb-5b', 'Setup digital too', { dashed: true }),
+      edge('e-lb5b', 'lb-5b', 'lb-6')
+    ]
+  }
+}
+
+// ─── 13. Digital Product Launch ──────────────────────────────────────────
+export function digitalProductLaunch(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Digital Product Launch Funnel',
+    description: 'A marketing and sales pipeline for launching an ebook, course, or digital asset.',
+    category: 'business',
+    tags: ['business', 'marketing', 'sales', 'funnel', 'digital-product'],
+    createdAt: now,
+    updatedAt: now,
+    nodes: [
+      node('dp-1', 'start', 0, 0, { label: 'Lead Magnet Creation', description: 'Free value to build list', details: 'Create a high-value, free resource (PDF, mini-course, template) related to your paid product.' }),
+      node('dp-2', 'task', 0, 150, { label: 'Landing Page & Opt-in', description: 'Collect email addresses', details: 'Build a high-converting landing page offering the lead magnet in exchange for an email address.' }),
+      node('dp-3', 'task', 0, 300, { label: 'Email Nurture Sequence', description: 'Build trust and authority', details: 'Send a 5-day automated email sequence delivering value, sharing case studies, and introducing the problem your product solves.' }),
+      node('dp-4', 'decision', 0, 450, { label: 'Pitch Product', description: 'Open the cart', details: 'Send the sales email. Did the user click through to the sales page?' }),
+      node('dp-5a', 'task', -150, 600, { label: 'Retargeting & Follow-up', description: 'Overcome objections', details: 'Send follow-up emails addressing common objections (price, time, results) or run retargeting ads.' }),
+      node('dp-5b', 'task', 150, 600, { label: 'Checkout & Upsell', description: 'Process payment & offer more', details: 'User purchases the product. Present a one-click upsell or order bump to increase average order value.' }),
+      node('dp-6', 'end', 0, 750, { label: 'Onboarding Sequence', description: 'Deliver product & ensure success', details: 'Send welcome email with access details and start the post-purchase engagement sequence.' })
+    ],
+    edges: [
+      edge('e-dp1', 'dp-1', 'dp-2'),
+      edge('e-dp2', 'dp-2', 'dp-3'),
+      edge('e-dp3', 'dp-3', 'dp-4'),
+      edge('e-dp4a', 'dp-4', 'dp-5a', 'No Click/Purchase', { color: '#f43f5e' }),
+      edge('e-dp4b', 'dp-4', 'dp-5b', 'Purchased', { color: '#10b981' }),
+      edge('e-dp5a', 'dp-5a', 'dp-4', 'Retry Pitch', { dashed: true, lineStyle: 'bezier' }),
+      edge('e-dp5b', 'dp-5b', 'dp-6')
+    ]
+  }
+}
+
+// ─── 14. Spaced Repetition Study System ──────────────────────────────────
+export function spacedRepetition(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Spaced Repetition Study System',
+    description: 'An evidence-based learning system for long-term memory retention.',
+    category: 'student',
+    tags: ['student', 'study', 'learning', 'memory', 'anki'],
+    createdAt: now,
+    updatedAt: now,
+    nodes: [
+      node('sr-1', 'start', 0, 0, { label: 'Information Intake', description: 'Read/Listen to material', details: 'Consume the source material (lecture, textbook, article) and understand the core concepts first.' }),
+      node('sr-2', 'task', 0, 150, { label: 'Extract Flashcards', description: 'Create Q&A pairs', details: 'Distill the information into atomic, active-recall questions. Avoid putting too much info on one card.' }),
+      node('sr-3', 'task', 0, 300, { label: 'First Review', description: 'Initial learning phase', details: 'Review the new cards immediately. You should be able to answer them correctly.' }),
+      node('sr-4', 'decision', 0, 450, { label: 'Recall Assessment', description: 'How hard was it to remember?', details: 'When reviewing a card later, honestly grade your recall: Easy, Good, Hard, or Again (Forgot).' }),
+      node('sr-5a', 'task', -200, 600, { label: 'Review Tomorrow (Again)', description: 'Reset interval', details: 'You forgot the card. The interval resets, and you will see it again tomorrow.' }),
+      node('sr-5b', 'task', 0, 600, { label: 'Review in 3 Days (Hard)', description: 'Slightly increase interval', details: 'You remembered, but it took significant effort.' }),
+      node('sr-5c', 'task', 200, 600, { label: 'Review in 7+ Days (Easy)', description: 'Significantly increase interval', details: 'You recalled the information instantly. The card is pushed further into the future.' }),
+      node('sr-6', 'end', 0, 750, { label: 'Long-Term Retention', description: 'Knowledge solidified', details: 'Through repeated spaced exposure, the information is now stored in long-term memory.' })
+    ],
+    edges: [
+      edge('e-sr1', 'sr-1', 'sr-2'),
+      edge('e-sr2', 'sr-2', 'sr-3'),
+      edge('e-sr3', 'sr-3', 'sr-4'),
+      edge('e-sr4a', 'sr-4', 'sr-5a', 'Forgot', { color: '#ef4444' }),
+      edge('e-sr4b', 'sr-4', 'sr-5b', 'Hard', { color: '#f59e0b' }),
+      edge('e-sr4c', 'sr-4', 'sr-5c', 'Easy', { color: '#10b981' }),
+      edge('e-sr5a', 'sr-5a', 'sr-4', 'Next Review', { dashed: true, lineStyle: 'bezier' }),
+      edge('e-sr5b', 'sr-5b', 'sr-4', 'Next Review', { dashed: true, lineStyle: 'bezier' }),
+      edge('e-sr5c', 'sr-5c', 'sr-6')
+    ]
+  }
+}
+
+// ─── 15. Research Paper Pipeline ─────────────────────────────────────────
+export function researchPaperPipeline(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Academic Research & Writing Pipeline',
+    description: 'A structured approach to literature review, data synthesis, and academic writing.',
+    category: 'student',
+    tags: ['student', 'research', 'writing', 'academic', 'thesis'],
+    createdAt: now,
+    updatedAt: now,
+    nodes: [
+      node('rp-1', 'start', 0, 0, { label: 'Define Research Question', description: 'Narrow the scope', details: 'Formulate a specific, arguable, and researchable question to guide your literature search.' }),
+      node('rp-2', 'task', 0, 150, { label: 'Literature Search', description: 'Gather primary sources', details: 'Use academic databases (JSTOR, PubMed, Google Scholar) to find relevant peer-reviewed papers.' }),
+      node('rp-3', 'task', 0, 300, { label: 'Annotated Bibliography', description: 'Summarize & evaluate', details: 'Write brief summaries and evaluations of key sources to track how they relate to your thesis.' }),
+      node('rp-4', 'decision', 0, 450, { label: 'Sufficient Evidence?', description: 'Do you have enough data?', details: 'Evaluate if your gathered sources adequately support your intended argument or address the research question.' }),
+      node('rp-5a', 'task', -150, 600, { label: 'Refine Search', description: 'Adjust keywords & databases', details: 'Modify your search terms, look at bibliographies of key papers, and gather more specific evidence.' }),
+      node('rp-5b', 'task', 150, 600, { label: 'Outline & Draft', description: 'Structure the paper', details: 'Create a detailed outline (Intro, Lit Review, Methodology, Results, Discussion) and write the first draft.' }),
+      node('rp-6', 'end', 0, 750, { label: 'Revise & Cite', description: 'Final polish', details: 'Edit for clarity, flow, and academic tone. Ensure all citations and the bibliography are correctly formatted.' })
+    ],
+    edges: [
+      edge('e-rp1', 'rp-1', 'rp-2'),
+      edge('e-rp2', 'rp-2', 'rp-3'),
+      edge('e-rp3', 'rp-3', 'rp-4'),
+      edge('e-rp4a', 'rp-4', 'rp-5a', 'No, need more', { color: '#f59e0b' }),
+      edge('e-rp4b', 'rp-4', 'rp-5b', 'Yes, proceed', { color: '#10b981' }),
+      edge('e-rp5a', 'rp-5a', 'rp-3', 'Analyze new sources', { dashed: true, lineStyle: 'bezier' }),
+      edge('e-rp5b', 'rp-5b', 'rp-6')
+    ]
+  }
+}
+
+// ─── 16. Student Progress Tracking & Intervention ────────────────────────
+export function studentProgressTracking(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Student Progress Tracking & Intervention',
+    description: 'A proactive framework for monitoring student performance and providing timely support.',
+    category: 'teacher',
+    tags: ['teacher', 'admin', 'tracking', 'intervention', 'education'],
+    createdAt: now,
+    updatedAt: now,
+    nodes: [
+      node('spt-1', 'start', 0, 0, { label: 'Formative Assessment', description: 'Initial knowledge check', details: 'Administer a quiz, exit ticket, or brief assignment to gauge baseline understanding of the topic.' }),
+      node('spt-2', 'task', 0, 150, { label: 'Data Analysis', description: 'Review scores & trends', details: 'Analyze the assessment data to identify common misconceptions and pinpoint students who are struggling.' }),
+      node('spt-3', 'decision', 0, 300, { label: 'Performance Tier?', description: 'Categorize student needs', details: 'Based on the data, group students into tiers for targeted instruction.' }),
+      node('spt-4a', 'task', -200, 450, { label: 'Tier 3: Intensive Support', description: '1-on-1 tutoring', details: 'Schedule individualized sessions to reteach foundational concepts. Consider special education referral if lack of progress persists.' }),
+      node('spt-4b', 'task', 0, 450, { label: 'Tier 2: Targeted Group', description: 'Small group reteaching', details: 'Form a small group of students with similar gaps. Reteach the specific skill using a different instructional method.' }),
+      node('spt-4c', 'task', 200, 450, { label: 'Tier 1: Core/Enrichment', description: 'Proceed or extend', details: 'Student has mastered the concept. Proceed with standard curriculum or provide enrichment/extension activities.' }),
+      node('spt-5', 'end', 0, 600, { label: 'Summative Re-Assessment', description: 'Verify mastery', details: 'Administer a follow-up assessment to ensure the interventions were successful and mastery was achieved.' })
+    ],
+    edges: [
+      edge('e-spt1', 'spt-1', 'spt-2'),
+      edge('e-spt2', 'spt-2', 'spt-3'),
+      edge('e-spt3a', 'spt-3', 'spt-4a', 'Significant Deficit (<60%)', { color: '#ef4444' }),
+      edge('e-spt3b', 'spt-3', 'spt-4b', 'Partial Mastery (60-80%)', { color: '#f59e0b' }),
+      edge('e-spt3c', 'spt-3', 'spt-4c', 'Mastery (>80%)', { color: '#10b981' }),
+      edge('e-spt4a', 'spt-4a', 'spt-5'),
+      edge('e-spt4b', 'spt-4b', 'spt-5'),
+      edge('e-spt4c', 'spt-4c', 'spt-5')
+    ]
+  }
+}
+
+// ─── 17. Flipped Classroom Planning ──────────────────────────────────────
+export function flippedClassroom(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Flipped Classroom Lesson Design',
+    description: 'Design a lesson where students learn concepts at home and apply them in class.',
+    category: 'teacher',
+    tags: ['teacher', 'planning', 'flipped-classroom', 'active-learning'],
+    createdAt: now,
+    updatedAt: now,
+    nodes: [
+      node('fc-1', 'start', 0, 0, { label: 'Identify Core Concept', description: 'What is the key learning objective?', details: 'Determine the specific skill or concept students need to master.' }),
+      node('fc-2', 'task', 0, 150, { label: 'Curate Pre-Class Media', description: 'Video, podcast, or reading', details: 'Create or find a short, engaging video or article that introduces the core concept. Keep it under 10 minutes.' }),
+      node('fc-3', 'task', 0, 300, { label: 'Pre-Class Accountability', description: 'Check for understanding', details: 'Design a brief online quiz or guided notes sheet students must complete before coming to class.' }),
+      node('fc-4', 'decision', 0, 450, { label: 'In-Class Application', description: 'How will they use the knowledge?', details: 'Design the active learning activity for the classroom.' }),
+      node('fc-5a', 'task', -150, 600, { label: 'Collaborative Project', description: 'Group problem solving', details: 'Students work in teams to solve a complex problem using the pre-class knowledge. Teacher facilitates and assists.' }),
+      node('fc-5b', 'task', 150, 600, { label: 'Debate / Discussion', description: 'Peer-to-peer exploration', details: 'Host a structured debate, Socratic seminar, or peer review session based on the pre-class material.' }),
+      node('fc-6', 'end', 0, 750, { label: 'Synthesis & Reflection', description: 'Consolidate learning', details: 'Wrap up the class with a brief synthesis of the main takeaways and a reflection on the learning process.' })
+    ],
+    edges: [
+      edge('e-fc1', 'fc-1', 'fc-2'),
+      edge('e-fc2', 'fc-2', 'fc-3'),
+      edge('e-fc3', 'fc-3', 'fc-4'),
+      edge('e-fc4a', 'fc-4', 'fc-5a', 'STEM / Application', { color: '#3b82f6' }),
+      edge('e-fc4b', 'fc-4', 'fc-5b', 'Humanities / Theory', { color: '#8b5cf6' }),
+      edge('e-fc5a', 'fc-5a', 'fc-6'),
+      edge('e-fc5b', 'fc-5b', 'fc-6')
+    ]
+  }
+}
+
+// ─── 18. Online Course Launch ────────────────────────────────────────────
+export function onlineCourseLaunch(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Online Course Creation & Launch',
+    description: 'End-to-end process from ideation to launching a profitable online course.',
+    category: 'business',
+    tags: ['business', 'online-teacher', 'course', 'launch', 'creator'],
+    createdAt: now,
+    updatedAt: now,
+    nodes: [
+      node('oc-1', 'start', 0, 0, { label: 'Audience Research', description: 'Find the painful problem', details: 'Survey your audience or analyze forums to identify a specific, urgent problem they are willing to pay to solve.' }),
+      node('oc-2', 'task', 0, 150, { label: 'Pre-sell (Beta Launch)', description: 'Validate the idea', details: 'Create an outline and a sales page. Try to sell the course before you build it to validate demand.' }),
+      node('oc-3', 'decision', 0, 300, { label: 'Validation Goal Met?', description: 'Did enough people buy?', details: 'Assess if you reached your minimum viable sales target to justify building the course.' }),
+      node('oc-4a', 'task', -150, 450, { label: 'Pivot or Refund', description: 'Idea invalidated', details: 'Refund the early buyers and pivot to a new idea or angle based on feedback.' }),
+      node('oc-4b', 'task', 150, 450, { label: 'Content Production', description: 'Record & Edit', details: 'Record the video lessons, create worksheets, and edit the content. Deliver live if it is a cohort course.' }),
+      node('oc-5', 'task', 150, 600, { label: 'Platform Setup', description: 'LMS & Payment Gateway', details: 'Upload content to Teachable, Thinkific, or Kajabi. Set up Stripe integration and affiliate links.' }),
+      node('oc-6', 'end', 150, 750, { label: 'Evergreen Launch', description: 'Automate sales', details: 'Set up an automated email funnel or webinar to sell the course passively on autopilot.' })
+    ],
+    edges: [
+      edge('e-oc1', 'oc-1', 'oc-2'),
+      edge('e-oc2', 'oc-2', 'oc-3'),
+      edge('e-oc3a', 'oc-3', 'oc-4a', 'Failed Target', { color: '#ef4444' }),
+      edge('e-oc3b', 'oc-3', 'oc-4b', 'Hit Target', { color: '#10b981' }),
+      edge('e-oc4b', 'oc-4b', 'oc-5'),
+      edge('e-oc5', 'oc-5', 'oc-6')
+    ]
+  }
+}
+
+// ─── 19. Content Creation Pipeline ───────────────────────────────────────
+export function contentCreationPipeline(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Multi-Channel Content Creation Pipeline',
+    description: 'System for turning one core idea into multiple pieces of content across platforms.',
+    category: 'productivity',
+    tags: ['productivity', 'content-creator', 'marketing', 'system'],
+    createdAt: now,
+    updatedAt: now,
+    nodes: [
+      node('cc-1', 'start', 0, 0, { label: 'Idea Capture & SEO', description: 'Keyword research & ideation', details: 'Log content ideas in a database (Notion/Airtable). Validate ideas with basic keyword research.' }),
+      node('cc-2', 'task', 0, 150, { label: 'Pillar Content Creation', description: 'YouTube Video or Podcast', details: 'Write the script and record the core, long-form piece of content (the "Pillar").' }),
+      node('cc-3', 'task', 0, 300, { label: 'Repurpose: Blog Post', description: 'Transcribe & Format', details: 'Transcribe the video/audio, edit for readability, add headings, and publish as an SEO-optimized blog post.' }),
+      node('cc-4', 'decision', 0, 450, { label: 'Micro-Content Extraction', description: 'Splice into short-form', details: 'Identify the best 15-60 second clips or key quotes from the pillar content.' }),
+      node('cc-5a', 'task', -150, 600, { label: 'Short-Form Video', description: 'Reels, Shorts, TikTok', details: 'Edit the clips into vertical videos with captions and trending audio.' }),
+      node('cc-5b', 'task', 150, 600, { label: 'Text/Image Posts', description: 'Twitter/X, LinkedIn, IG Carousel', details: 'Turn key quotes into text posts or design them into carousel graphics using Canva.' }),
+      node('cc-6', 'end', 0, 750, { label: 'Schedule & Publish', description: 'Buffer / HootSuite', details: 'Load all repurposed assets into a social media scheduler to be published throughout the week.' })
+    ],
+    edges: [
+      edge('e-cc1', 'cc-1', 'cc-2'),
+      edge('e-cc2', 'cc-2', 'cc-3'),
+      edge('e-cc3', 'cc-3', 'cc-4'),
+      edge('e-cc4a', 'cc-4', 'cc-5a', 'Video Clips', { color: '#8b5cf6' }),
+      edge('e-cc4b', 'cc-4', 'cc-5b', 'Text/Quotes', { color: '#3b82f6' }),
+      edge('e-cc5a', 'cc-5a', 'cc-6'),
+      edge('e-cc5b', 'cc-5b', 'cc-6')
+    ]
+  }
+}
+
 export function createSampleWorkflows(): Record<string, Workflow> {
   const samples = [
     ragPipeline(),
@@ -1131,6 +1455,16 @@ export function createSampleWorkflows(): Record<string, Workflow> {
     ieltsReading(),
     eslLessonPlanning(),
     eslErrorCorrection(),
+    gtdReview(),
+    deepWorkSprint(),
+    localBusinessSetup(),
+    digitalProductLaunch(),
+    spacedRepetition(),
+    researchPaperPipeline(),
+    studentProgressTracking(),
+    flippedClassroom(),
+    onlineCourseLaunch(),
+    contentCreationPipeline(),
   ]
   return Object.fromEntries(samples.map((wf) => [wf.id, wf]))
 }

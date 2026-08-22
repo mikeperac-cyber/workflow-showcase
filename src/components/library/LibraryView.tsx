@@ -16,6 +16,10 @@ function formatDate(timestamp: number): string {
 /** Left-border accent color keyed to workflow category. */
 function categoryBorderColor(category?: string): string {
   if (category === 'ai')    return '#8b5cf6'  // violet
+  if (category === 'productivity') return '#f97316' // orange
+  if (category === 'business') return '#f59e0b' // amber
+  if (category === 'student') return '#06b6d4' // cyan
+  if (category === 'teacher') return '#ec4899' // pink
   if (category === 'ielts') return '#3b82f6'  // blue
   if (category === 'esl')   return '#10b981'  // emerald
   return '#64748b'                            // slate (custom)
@@ -24,15 +28,23 @@ function categoryBorderColor(category?: string): string {
 /** Category pill label and color classes. */
 function CategoryPill({ category }: { category?: string }) {
   if (!category) return null
-  const label = category === 'ai' ? 'AI' : category === 'ielts' ? 'IELTS' : category === 'esl' ? 'ESL' : 'Custom'
+  const label = category === 'ai' ? 'AI' : category === 'productivity' ? 'Productivity' : category === 'business' ? 'Business' : category === 'student' ? 'Student' : category === 'teacher' ? 'Teacher' : category === 'ielts' ? 'IELTS' : category === 'esl' ? 'ESL' : 'Custom'
   const cls =
     category === 'ai'
       ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300'
-      : category === 'ielts'
-        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
-        : category === 'esl'
-          ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
-          : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+      : category === 'productivity'
+        ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300'
+        : category === 'business'
+          ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+          : category === 'student'
+            ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300'
+            : category === 'teacher'
+              ? 'bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300'
+              : category === 'ielts'
+                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                : category === 'esl'
+                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
+                  : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
   return (
     <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wider ${cls}`}>
       {label}
@@ -118,6 +130,10 @@ const WorkflowCard = memo(function WorkflowCard({ workflow }: { workflow: Workfl
 const CATEGORY_FILTERS = [
   { label: 'All', value: '' },
   { label: 'AI', value: 'ai' },
+  { label: 'Productivity', value: 'productivity' },
+  { label: 'Business', value: 'business' },
+  { label: 'Student', value: 'student' },
+  { label: 'Teacher', value: 'teacher' },
   { label: 'IELTS', value: 'ielts' },
   { label: 'ESL', value: 'esl' },
   { label: 'Custom', value: 'custom' },
@@ -129,7 +145,7 @@ export function LibraryView() {
   const openBuilder = useWorkflowStore((s) => s.openBuilder)
 
   const [search, setSearch] = useState('')
-  const [activeCategory, setActiveCategory] = useState<'' | 'ai' | 'ielts' | 'esl' | 'custom'>('')
+  const [activeCategory, setActiveCategory] = useState<'' | 'ai' | 'ielts' | 'esl' | 'productivity' | 'business' | 'student' | 'teacher' | 'custom'>('')
   const [showAiModal, setShowAiModal] = useState(false)
 
   const sorted = useMemo(
