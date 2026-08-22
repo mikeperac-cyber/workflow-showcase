@@ -1608,6 +1608,421 @@ export function abandonedCartRecovery(): Workflow {
   }
 }
 
+
+
+
+// ─── 25. Automated Code Review & PR Merge Pipeline ──────────────────────────
+export function automatedCodeReview(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Autonomous PR Review & Merge Pipeline',
+    description: 'AI-driven code review process that analyzes pull requests, enforces style guides, runs security scans, and auto-merges safe PRs.',
+    category: 'ai',
+    tags: ['ai', 'github', 'ci-cd', 'engineering', 'automation'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Webhook',
+    tools: ['GitHub', 'SonarQube', 'OpenAI', 'Slack'],
+    nodes: [
+      node('cr-1', 'start', 0, 0, { label: 'GitHub PR Webhook', description: 'PR opened/synchronized', mockLogs: ['[GitHub] Webhook received for PR #1042', 'Action: opened', 'Repository: backend-api'] }),
+      node('cr-2', 'tool', 0, 150, { label: 'SonarQube SAST', description: 'Static Application Security Testing', mockLogs: ['[SonarQube] Initiating scan for branch feature/auth-fix', 'Vulnerabilities: 0, Code Smells: 2', 'Quality Gate: PASSED'] }),
+      node('cr-3', 'agent', 0, 300, { label: 'AI Senior Engineer', description: 'Semantic Code Review', model: 'gpt-4o', mockLogs: ['Prompting GPT-4o with PR diff...', 'Generated review comments: "Refactor nested loop to O(N)", "Ensure DB connection is closed."'] }),
+      node('cr-4', 'decision', 0, 450, { label: 'Approval Gate', description: 'Evaluate AI & SAST results', mockLogs: ['Evaluating conditions...', 'AI Review: Approved with nits', 'SAST: Passed'] }),
+      node('cr-5a', 'tool', -150, 600, { label: 'Request Changes', description: 'Post comments to PR', mockLogs: ['[GitHub API] Posting review comments to PR #1042', 'State: CHANGES_REQUESTED'] }),
+      node('cr-5b', 'tool', 150, 600, { label: 'Squash & Merge', description: 'Auto-merge branch', mockLogs: ['[GitHub API] Executing Squash & Merge on PR #1042', 'Branch deleted.'] }),
+      node('cr-6', 'end', 150, 750, { label: 'Slack Alert', description: 'Notify Engineering Team', mockLogs: ['[Slack API] Sending to #engineering-ops', 'Message: "PR #1042 merged successfully to main"'] })
+    ],
+    edges: [
+      edge('e-cr1', 'cr-1', 'cr-2'),
+      edge('e-cr2', 'cr-2', 'cr-3'),
+      edge('e-cr3', 'cr-3', 'cr-4'),
+      edge('e-cr4a', 'cr-4', 'cr-5a', 'Issues Found', { color: '#f43f5e' }),
+      edge('e-cr4b', 'cr-4', 'cr-5b', 'All Checks Passed', { color: '#10b981' }),
+      edge('e-cr5b', 'cr-5b', 'cr-6')
+    ]
+  }
+}
+
+// ─── 26. Cybersecurity Incident Response ────────────────────────────────────
+export function cyberIncidentResponse(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Automated Cyber Incident Response',
+    description: 'SecOps playbook for isolating compromised endpoints, collecting forensics, and notifying compliance teams.',
+    category: 'business',
+    tags: ['security', 'soc', 'automation', 'enterprise'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Event',
+    tools: ['CrowdStrike', 'AWS', 'Jira', 'PagerDuty'],
+    nodes: [
+      node('ir-1', 'start', 0, 0, { label: 'EDR Alert', description: 'CrowdStrike Malware Detect', mockLogs: ['[CrowdStrike] Critical Alert: Ransomware behavior detected', 'Endpoint: WIN-SRV-042', 'Severity: High'] }),
+      node('ir-2', 'decision', 0, 150, { label: 'Threat Severity', description: 'Determine escalation path', mockLogs: ['Parsing severity level...', 'Severity is High -> Executing Containment Playbook'] }),
+      node('ir-3a', 'tool', -150, 300, { label: 'Isolate Host', description: 'Network quarantine', mockLogs: ['[AWS EC2] Modifying Security Group for i-0abcd1234', 'Inbound: Block All', 'Outbound: Block All'] }),
+      node('ir-3b', 'tool', 150, 300, { label: 'Collect Forensics', description: 'Memory dump & logs', mockLogs: ['[CrowdStrike API] Initiating memory dump', 'Uploading logs to S3 cold storage bucket'] }),
+      node('ir-4', 'task', -150, 450, { label: 'Revoke IAM Credentials', description: 'Disable user tokens', mockLogs: ['[AWS IAM] Revoking active sessions for user: admin-svc'] }),
+      node('ir-5', 'tool', 0, 600, { label: 'Trigger PagerDuty', description: 'Page On-Call SecOps', mockLogs: ['[PagerDuty API] Triggering High Urgency Incident', 'Paging primary on-call: SecOps Team'] }),
+      node('ir-6', 'end', 0, 750, { label: 'Create Jira Ticket', description: 'Audit & Compliance tracking', mockLogs: ['[Jira API] Creating Epic: IR-2094', 'Attaching initial forensic logs and quarantine status'] })
+    ],
+    edges: [
+      edge('e-ir1', 'ir-1', 'ir-2'),
+      edge('e-ir2a', 'ir-2', 'ir-3a', 'High/Critical', { color: '#ef4444' }),
+      edge('e-ir2b', 'ir-2', 'ir-3b', 'High/Critical', { color: '#f59e0b' }),
+      edge('e-ir3a', 'ir-3a', 'ir-4'),
+      edge('e-ir4', 'ir-4', 'ir-5'),
+      edge('e-ir3b', 'ir-3b', 'ir-5'),
+      edge('e-ir5', 'ir-5', 'ir-6')
+    ]
+  }
+}
+
+// ─── 27. Zero-Based Budgeting Automation ──────────────────────────────────
+export function zeroBasedBudgeting(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Automated Zero-Based Budgeting',
+    description: 'Pulls transactions via Plaid, categorizes with an LLM, and balances a YNAB/Notion spreadsheet.',
+    category: 'productivity',
+    tags: ['finance', 'automation', 'budget', 'plaid'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Schedule',
+    tools: ['Plaid', 'OpenAI', 'Notion', 'Twilio'],
+    nodes: [
+      node('zb-1', 'start', 0, 0, { label: 'Daily Cron', description: 'Run at midnight', mockLogs: ['Cron triggered', 'Initiating daily bank sync'] }),
+      node('zb-2', 'tool', 0, 150, { label: 'Fetch Transactions', description: 'Plaid API', mockLogs: ['[Plaid API] Syncing transactions for Chase Checking', 'Fetched 4 new transactions'] }),
+      node('zb-3', 'agent', 0, 300, { label: 'Transaction Classifier', description: 'LLM Categorization', model: 'gpt-4o-mini', mockLogs: ['Prompting LLM with vendor names...', '"Starbucks" -> "Dining"', '"Uber" -> "Transport"'] }),
+      node('zb-4', 'tool', 0, 450, { label: 'Update Notion DB', description: 'Upsert records', mockLogs: ['[Notion API] Adding 4 rows to Expenses Database', 'Calculating remaining budget for categories'] }),
+      node('zb-5', 'decision', 0, 600, { label: 'Budget Check', description: 'Are any categories overdrawn?', mockLogs: ['Checking Dining balance...', 'Dining budget remaining: -$12.50'] }),
+      node('zb-6a', 'tool', -150, 750, { label: 'Send SMS Alert', description: 'Overdraft warning', mockLogs: ['[Twilio API] Sending SMS: "Alert: Dining budget is overdrawn by $12.50"'] }),
+      node('zb-6b', 'end', 150, 750, { label: 'Sync Complete', description: 'All balanced', mockLogs: ['Budgets balanced. No alerts needed.'] })
+    ],
+    edges: [
+      edge('e-zb1', 'zb-1', 'zb-2'),
+      edge('e-zb2', 'zb-2', 'zb-3'),
+      edge('e-zb3', 'zb-3', 'zb-4'),
+      edge('e-zb4', 'zb-4', 'zb-5'),
+      edge('e-zb5a', 'zb-5', 'zb-6a', 'Overdrawn', { color: '#f43f5e' }),
+      edge('e-zb5b', 'zb-5', 'zb-6b', 'In limits', { color: '#10b981' })
+    ]
+  }
+}
+
+// ─── 28. Corporate Webinar Lifecycle ──────────────────────────────────────
+export function corporateWebinar(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Enterprise Webinar Lifecycle',
+    description: 'Manages Zoom registration, HubSpot CRM tracking, pre-event reminders, and post-event lead scoring.',
+    category: 'business',
+    tags: ['marketing', 'webinar', 'zoom', 'hubspot', 'lead-scoring'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Webhook',
+    tools: ['Zoom', 'HubSpot', 'Marketo'],
+    nodes: [
+      node('cw-1', 'start', 0, 0, { label: 'Zoom Registration', description: 'Attendee signs up', mockLogs: ['[Zoom Webhook] New registration for Webinar 88291', 'Attendee: jane.smith@acme.com'] }),
+      node('cw-2', 'tool', 0, 150, { label: 'CRM Upsert', description: 'HubSpot Contact Sync', mockLogs: ['[HubSpot API] Upserting contact', 'Setting property "Webinar_Registered" = True'] }),
+      node('cw-3', 'task', 0, 300, { label: 'Pre-Event Sequence', description: 'Delay & Reminders', mockLogs: ['Scheduling email for T-24 hours', 'Scheduling email for T-1 hour'] }),
+      node('cw-4', 'decision', 0, 450, { label: 'Attendance Check', description: 'Post-webinar webhook', mockLogs: ['Evaluating attendance log...', 'jane.smith@acme.com attended for 45 minutes'] }),
+      node('cw-5a', 'tool', -150, 600, { label: 'No-Show Sequence', description: 'Send recording', mockLogs: ['[Marketo API] Triggering "No Show" email sequence', 'Including link to VOD'] }),
+      node('cw-5b', 'tool', 150, 600, { label: 'Attendee Sequence', description: 'Send next steps', mockLogs: ['[Marketo API] Triggering "Attended" email sequence', 'Including link to consultation calendar'] }),
+      node('cw-6', 'end', 150, 750, { label: 'Lead Scoring', description: 'Add +20 points', mockLogs: ['[HubSpot API] Updating Lead Score +20 for Jane Smith', 'Threshold met: Routing to Sales Queue'] })
+    ],
+    edges: [
+      edge('e-cw1', 'cw-1', 'cw-2'),
+      edge('e-cw2', 'cw-2', 'cw-3'),
+      edge('e-cw3', 'cw-3', 'cw-4'),
+      edge('e-cw4a', 'cw-4', 'cw-5a', 'Did not attend', { color: '#f59e0b' }),
+      edge('e-cw4b', 'cw-4', 'cw-5b', 'Attended', { color: '#10b981' }),
+      edge('e-cw5b', 'cw-5b', 'cw-6')
+    ]
+  }
+}
+
+// ─── 29. Client Intake & Initial Assessment ───────────────────────────────
+export function clientIntakeFlow(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Healthcare Client Intake & Assessment',
+    description: 'HIPAA-compliant flow for onboarding new patients, analyzing intake forms via LLM, and generating practitioner briefs.',
+    category: 'business',
+    tags: ['healthcare', 'intake', 'onboarding', 'hipaa', 'ai'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Webhook',
+    tools: ['Typeform', 'OpenAI', 'EHR System'],
+    nodes: [
+      node('ci-1', 'start', 0, 0, { label: 'Intake Form Submitted', description: 'Secure Webhook', mockLogs: ['Received secure payload', 'Patient ID: P-9921', 'Redacting PII before processing...'] }),
+      node('ci-2', 'tool', 0, 150, { label: 'Sync to EHR', description: 'Create Patient Record', mockLogs: ['[EHR API] Creating new patient profile', 'Status: Draft'] }),
+      node('ci-3', 'agent', 0, 300, { label: 'Medical History Analyzer', description: 'LLM Risk extraction', model: 'gpt-4o', mockLogs: ['Analyzing family history and symptoms...', 'Flagged: High blood pressure, penicillin allergy', 'Generating summary brief'] }),
+      node('ci-4', 'decision', 0, 450, { label: 'Risk Triage', description: 'Evaluate severity flags', mockLogs: ['Evaluating AI flags...', 'Risk Level: Medium -> Standard Scheduling'] }),
+      node('ci-5a', 'tool', -150, 600, { label: 'Urgent Alert', description: 'Page clinical staff', mockLogs: ['[System] Critical symptom detected', 'Paging duty nurse'] }),
+      node('ci-5b', 'task', 150, 600, { label: 'Generate Brief', description: 'Attach to EHR', mockLogs: ['Formatting LLM output into clinical brief', 'Attaching PDF to Patient P-9921'] }),
+      node('ci-6', 'end', 150, 750, { label: 'Send Booking Link', description: 'Automated scheduling', mockLogs: ['Sending automated email with Calendly link for initial consultation'] })
+    ],
+    edges: [
+      edge('e-ci1', 'ci-1', 'ci-2'),
+      edge('e-ci2', 'ci-2', 'ci-3'),
+      edge('e-ci3', 'ci-3', 'ci-4'),
+      edge('e-ci4a', 'ci-4', 'ci-5a', 'High Risk', { color: '#ef4444' }),
+      edge('e-ci4b', 'ci-4', 'ci-5b', 'Low/Medium', { color: '#10b981' }),
+      edge('e-ci5b', 'ci-5b', 'ci-6')
+    ]
+  }
+}
+
+// ─── 30. Freelance Onboarding & Contracts ─────────────────────────────────
+export function freelanceOnboarding(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Freelance Client Onboarding & Contracts',
+    description: 'Fully automated proposal acceptance, contract generation via DocuSign, invoice creation, and project scaffolding.',
+    category: 'business',
+    tags: ['freelance', 'agency', 'contracts', 'invoicing'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Event',
+    tools: ['Stripe', 'DocuSign', 'Notion', 'Google Drive'],
+    nodes: [
+      node('fo-1', 'start', 0, 0, { label: 'Proposal Accepted', description: 'Triggered by CRM', mockLogs: ['Client clicked "Accept" on Proposal #402', 'Client: XYZ Corp'] }),
+      node('fo-2', 'tool', 0, 150, { label: 'Generate Contract', description: 'DocuSign API', mockLogs: ['[DocuSign API] Merging template with client details', 'Sending envelope to client@xyz.com'] }),
+      node('fo-3', 'decision', 0, 300, { label: 'Signature Webhook', description: 'Wait for execution', mockLogs: ['Awaiting DocuSign webhook...', 'Webhook received: Envelope Signed'] }),
+      node('fo-4', 'tool', 0, 450, { label: 'Generate Invoice', description: 'Stripe Billing', mockLogs: ['[Stripe API] Creating customer XYZ Corp', 'Generating invoice for 50% deposit: $2,500'] }),
+      node('fo-5', 'tool', 0, 600, { label: 'Scaffold Project', description: 'Notion & Drive setup', mockLogs: ['[Notion API] Duplicating Client Portal template', '[Drive API] Creating shared folder structure'] }),
+      node('fo-6', 'end', 0, 750, { label: 'Kickoff Email', description: 'Send portal links', mockLogs: ['Sending welcome email with Notion URL, Drive link, and Stripe Invoice'] })
+    ],
+    edges: [
+      edge('e-fo1', 'fo-1', 'fo-2'),
+      edge('e-fo2', 'fo-2', 'fo-3'),
+      edge('e-fo3', 'fo-3', 'fo-4', 'Signed', { color: '#10b981' }),
+      edge('e-fo4', 'fo-4', 'fo-5'),
+      edge('e-fo5', 'fo-5', 'fo-6')
+    ]
+  }
+}
+
+// ─── 31. Advanced Data ETL Pipeline ───────────────────────────────────────
+export function advancedDataEtl(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Advanced Data Warehouse ETL Pipeline',
+    description: 'Extracts data from multiple SQL sources, transforms via dbt, and loads into Snowflake with data quality tests.',
+    category: 'productivity',
+    tags: ['data', 'engineering', 'etl', 'snowflake', 'dbt'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Schedule',
+    tools: ['Airflow', 'dbt', 'Snowflake', 'PostgreSQL'],
+    nodes: [
+      node('etl-1', 'start', 0, 0, { label: 'Airflow DAG Trigger', description: 'Nightly Run', mockLogs: ['Initiating DAG: core_etl_pipeline_v2', 'Execution Date: 2026-08-21'] }),
+      node('etl-2', 'task', 0, 150, { label: 'Extract (E)', description: 'Pull from Postgres RDS', mockLogs: ['Connecting to production RDS...', 'Extracting 450,210 rows from users table', 'Uploading to S3 raw bucket'] }),
+      node('etl-3', 'tool', 0, 300, { label: 'Load to Staging (L)', description: 'Snowflake COPY INTO', mockLogs: ['[Snowflake API] Executing COPY INTO staging.users FROM @s3_raw', 'Loaded 450,210 rows successfully'] }),
+      node('etl-4', 'tool', 0, 450, { label: 'Transform (T)', description: 'Run dbt models', mockLogs: ['[dbt Core] Running models...', 'Compiled 14 models', 'Created table analytics.dim_users'] }),
+      node('etl-5', 'decision', 0, 600, { label: 'dbt Tests', description: 'Data Quality Check', mockLogs: ['[dbt Core] Running tests...', 'Test not_null_dim_users_id: PASS', 'Test unique_dim_users_email: PASS'] }),
+      node('etl-6a', 'end', -150, 750, { label: 'Halt & Page', description: 'Data quality failed', mockLogs: ['Data quality tests FAILED. Halting pipeline to prevent bad data downstream.', 'Paging Data Engineering team.'] }),
+      node('etl-6b', 'end', 150, 750, { label: 'Publish to BI', description: 'Refresh Tableau extracts', mockLogs: ['Tests passed.', '[Tableau API] Triggering extract refresh for Executive Dashboard'] })
+    ],
+    edges: [
+      edge('e-etl1', 'etl-1', 'etl-2'),
+      edge('e-etl2', 'etl-2', 'etl-3'),
+      edge('e-etl3', 'etl-3', 'etl-4'),
+      edge('e-etl4', 'etl-4', 'etl-5'),
+      edge('e-etl5a', 'etl-5', 'etl-6a', 'Failed', { color: '#ef4444' }),
+      edge('e-etl5b', 'etl-5', 'etl-6b', 'Passed', { color: '#10b981' })
+    ]
+  }
+}
+
+// ─── 32. Autonomous B2B Sales Prospecting ─────────────────────────────────
+export function b2bSalesProspecting(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Autonomous B2B Sales Prospecting',
+    description: 'AI scrapes LinkedIn profiles, generates hyper-personalized outreach emails, and queues them in a sales sequencing tool.',
+    category: 'ai',
+    tags: ['ai', 'sales', 'outreach', 'b2b', 'automation'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Schedule',
+    tools: ['LinkedIn', 'OpenAI', 'Apollo', 'HubSpot'],
+    nodes: [
+      node('sp-1', 'start', 0, 0, { label: 'Weekly Trigger', description: 'Fetch targeted accounts', mockLogs: ['Fetching target accounts from HubSpot', 'Found 50 target ICP accounts'] }),
+      node('sp-2', 'tool', 0, 150, { label: 'Scrape LinkedIn', description: 'Find decision makers', mockLogs: ['[Apollo API] Searching for "VP Engineering" at target accounts', 'Found 42 matching leads. Extracting recent LinkedIn posts.'] }),
+      node('sp-3', 'agent', 0, 300, { label: 'Personalization AI', description: 'Draft cold emails', model: 'claude-3-5-sonnet', mockLogs: ['Prompting Claude with lead context...', "Analyzing lead's recent post about cloud migration.", 'Drafting highly relevant, non-spammy email body.'] }),
+      node('sp-4', 'decision', 0, 450, { label: 'Quality Score Gate', description: 'Is email good?', mockLogs: ['Evaluating AI draft via internal scorer...', 'Score: 9.2/10 -> Proceeding'] }),
+      node('sp-5a', 'task', -150, 600, { label: 'Human Review', description: 'Draft needs work', mockLogs: ['Draft score < 7. Sending to SDR review queue in Notion.'] }),
+      node('sp-5b', 'tool', 150, 600, { label: 'Queue in Apollo', description: 'Add to Sequence', mockLogs: ['[Apollo API] Upserting contact', 'Adding to sequence: "Q3 Outbound - VP Eng"', 'Injecting custom AI first line.'] }),
+      node('sp-6', 'end', 150, 750, { label: 'CRM Update', description: 'Log activity', mockLogs: ['[HubSpot API] Logging "Added to Sequence" activity on lead record.'] })
+    ],
+    edges: [
+      edge('e-sp1', 'sp-1', 'sp-2'),
+      edge('e-sp2', 'sp-2', 'sp-3'),
+      edge('e-sp3', 'sp-3', 'sp-4'),
+      edge('e-sp4a', 'sp-4', 'sp-5a', 'Score < 7', { color: '#f59e0b' }),
+      edge('e-sp4b', 'sp-4', 'sp-5b', 'Score >= 7', { color: '#10b981' }),
+      edge('e-sp5b', 'sp-5b', 'sp-6')
+    ]
+  }
+}
+
+// ─── 33. HR Payroll & Compliance Run ──────────────────────────────────────
+export function hrPayrollRun(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'End-of-Month Payroll & Compliance Run',
+    description: 'Aggregates timesheets, calculates commissions, syncs to Gusto, and generates compliance reports.',
+    category: 'business',
+    tags: ['hr', 'payroll', 'finance', 'compliance', 'gusto'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Schedule',
+    tools: ['Deel', 'Salesforce', 'Workday'],
+    nodes: [
+      node('pr-1', 'start', 0, 0, { label: 'Month-End Trigger', description: '28th of the month', mockLogs: ['Executing monthly payroll aggregation pipeline'] }),
+      node('pr-2', 'tool', 0, 150, { label: 'Fetch Timesheets', description: 'Workday API', mockLogs: ['[Workday API] Extracting hourly worker timesheets', 'Validating total hours against legal limits'] }),
+      node('pr-3', 'tool', 0, 300, { label: 'Calculate Commissions', description: 'Salesforce API', mockLogs: ['[Salesforce API] Fetching "Closed Won" deals for current period', 'Applying 10% commission rate for AEs', 'Total commission pool: $42,500'] }),
+      node('pr-4', 'task', 0, 450, { label: 'Data Merging', description: 'Combine Base & Variable', mockLogs: ['Merging hourly, salary, and commission arrays into master payload'] }),
+      node('pr-5', 'decision', 0, 600, { label: 'Variance Check', description: 'Compare to last month', mockLogs: ['Comparing total run ($142k) to previous month ($138k)', 'Variance is 2.8% (Acceptable)'] }),
+      node('pr-6a', 'task', -150, 750, { label: 'Manual Audit Req', description: 'High variance detected', mockLogs: ['Variance > 10% detected! Halting automated push.', 'Alerting CFO for manual approval.'] }),
+      node('pr-6b', 'tool', 150, 750, { label: 'Push to Gusto', description: 'Execute Payroll Run', mockLogs: ['[Gusto API] Pushing final payroll numbers', 'Executing contractor payouts via Deel API'] }),
+      node('pr-7', 'end', 150, 900, { label: 'Compliance Reports', description: 'Generate PDFs', mockLogs: ['Generating tax liability and worker comp reports', 'Archiving to secure HR drive'] })
+    ],
+    edges: [
+      edge('e-pr1', 'pr-1', 'pr-2'),
+      edge('e-pr2', 'pr-2', 'pr-3'),
+      edge('e-pr3', 'pr-3', 'pr-4'),
+      edge('e-pr4', 'pr-4', 'pr-5'),
+      edge('e-pr5a', 'pr-5', 'pr-6a', '> 10% Variance', { color: '#ef4444' }),
+      edge('e-pr5b', 'pr-5', 'pr-6b', '< 10% Variance', { color: '#10b981' }),
+      edge('e-pr6b', 'pr-6b', 'pr-7')
+    ]
+  }
+}
+
+// ─── 34. Generative UI Design Scaffold ────────────────────────────────────
+export function generativeUiScaffold(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'AI Generative UI Scaffold Pipeline',
+    description: 'Takes a user wireframe sketch, analyzes it with Vision AI, and generates fully styled React/Tailwind code.',
+    category: 'ai',
+    tags: ['ai', 'development', 'design', 'react', 'vision'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Webhook',
+    tools: ['OpenAI', 'Vercel', 'Figma'],
+    nodes: [
+      node('ui-1', 'start', 0, 0, { label: 'Image Upload', description: 'Receive sketch', mockLogs: ['[Storage] Received base64 image payload', 'Image size: 1.2MB, Format: PNG'] }),
+      node('ui-2', 'agent', 0, 150, { label: 'Vision Analysis', description: 'Extract layout', model: 'gpt-4o', mockLogs: ['Prompting GPT-4o-Vision with image...', 'Detected components: Navbar, Hero section, 3-column feature grid.', 'Extracted text and primary layout constraints.'] }),
+      node('ui-3', 'agent', 0, 300, { label: 'Code Generation', description: 'React + Tailwind', model: 'claude-3-5-sonnet', mockLogs: ['Prompting Claude 3.5 Sonnet to write React code...', 'Writing JSX structure', 'Applying Tailwind CSS utility classes matching layout'] }),
+      node('ui-4', 'tool', 0, 450, { label: 'Lint & Format', description: 'Prettier / ESLint', mockLogs: ['Running Prettier...', 'Code formatted successfully', 'No ESLint warnings detected'] }),
+      node('ui-5', 'decision', 0, 600, { label: 'Build Check', description: 'Does it compile?', mockLogs: ['Executing virtual esbuild compile...', 'Compilation successful.'] }),
+      node('ui-6a', 'agent', -150, 750, { label: 'Self-Correction', description: 'Fix build errors', model: 'gpt-4o', mockLogs: ['Sending error stack trace back to LLM', 'LLM corrected syntax error in JSX.'] }),
+      node('ui-6b', 'end', 150, 750, { label: 'Return Artifact', description: 'Send code to client', mockLogs: ['Zipping components', 'Streaming JSON response to web client'] })
+    ],
+    edges: [
+      edge('e-ui1', 'ui-1', 'ui-2'),
+      edge('e-ui2', 'ui-2', 'ui-3'),
+      edge('e-ui3', 'ui-3', 'ui-4'),
+      edge('e-ui4', 'ui-4', 'ui-5'),
+      edge('e-ui5a', 'ui-5', 'ui-6a', 'Build Failed', { color: '#ef4444' }),
+      edge('e-ui6a', 'ui-6a', 'ui-4', 'Retry', { dashed: true, lineStyle: 'bezier' }),
+      edge('e-ui5b', 'ui-5', 'ui-6b', 'Build Passed', { color: '#10b981' })
+    ]
+  }
+}
+
+// ─── 35. Content Supply Chain & Translation ───────────────────────────────
+export function contentTranslationPipeline(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Global Content Localization Pipeline',
+    description: 'Automatically routes approved English blog posts to AI translators, requests human review, and publishes via CMS.',
+    category: 'productivity',
+    tags: ['localization', 'content', 'ai', 'cms'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Webhook',
+    tools: ['Contentful', 'DeepL', 'OpenAI', 'Slack'],
+    nodes: [
+      node('ct-1', 'start', 0, 0, { label: 'CMS Publish Event', description: 'English Post Published', mockLogs: ['[Contentful Webhook] Post ID: 9912 Published', 'Locale: en-US', 'Title: "Q3 Product Updates"'] }),
+      node('ct-2', 'tool', 0, 150, { label: 'Extract Markdown', description: 'Parse assets & text', mockLogs: ['Extracting raw markdown body', 'Preserving image links and HTML formatting tags'] }),
+      node('ct-3', 'agent', 0, 300, { label: 'AI Localization', description: 'Translate to ES, FR, DE', model: 'gpt-4o', mockLogs: ['Prompting translation for Spanish, French, and German', 'Applying brand glossary terminology rules', 'Translations generated'] }),
+      node('ct-4', 'decision', 0, 450, { label: 'Review Required?', description: 'Check routing rules', mockLogs: ['Checking translation policy...', 'High visibility tag detected -> Human review required'] }),
+      node('ct-5a', 'tool', -150, 600, { label: 'Notify Linguists', description: 'Slack approval request', mockLogs: ['[Slack API] Paging #localization-team with review links', 'Waiting for human approval webhook...'] }),
+      node('ct-5b', 'tool', 150, 600, { label: 'Upload Drafts to CMS', description: 'Contentful API', mockLogs: ['[Contentful API] Creating localized entries', 'Setting state to "Draft"'] }),
+      node('ct-6', 'end', 150, 750, { label: 'Publish Localization', description: 'Go live globally', mockLogs: ['Human approval received.', '[Contentful API] Publishing ES, FR, DE variants.'] })
+    ],
+    edges: [
+      edge('e-ct1', 'ct-1', 'ct-2'),
+      edge('e-ct2', 'ct-2', 'ct-3'),
+      edge('e-ct3', 'ct-3', 'ct-4'),
+      edge('e-ct4a', 'ct-4', 'ct-5a', 'Yes', { color: '#f59e0b' }),
+      edge('e-ct5a', 'ct-5a', 'ct-5b', 'Approved', { color: '#10b981' }),
+      edge('e-ct4b', 'ct-4', 'ct-5b', 'No (Auto-publish)', { color: '#3b82f6', dashed: true }),
+      edge('e-ct5b', 'ct-5b', 'ct-6')
+    ]
+  }
+}
+
+// ─── 36. Enterprise OKR Tracking & Alerting ───────────────────────────────
+export function okrTrackingPipeline(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Enterprise OKR Tracking & Alerting',
+    description: 'Pulls metrics from BI dashboards to update company OKRs automatically and alerts executives on off-track goals.',
+    category: 'productivity',
+    tags: ['business', 'okrs', 'analytics', 'slack', 'data'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Schedule',
+    tools: ['Tableau', 'Lattice', 'Slack'],
+    nodes: [
+      node('okr-1', 'start', 0, 0, { label: 'Weekly Execution', description: 'Runs Friday EOD', mockLogs: ['Triggered Friday 17:00', 'Starting OKR sync pipeline'] }),
+      node('okr-2', 'tool', 0, 150, { label: 'Query BI APIs', description: 'Tableau & Looker', mockLogs: ['[Tableau API] Fetching Q3 Revenue actuals...', 'Revenue = $4.2M', '[Looker API] Fetching Active Users...', 'MAU = 1.2M'] }),
+      node('okr-3', 'tool', 0, 300, { label: 'Update OKR Software', description: 'Lattice API', mockLogs: ['[Lattice API] Updating Key Result "Hit $5M Revenue"', 'Current Progress: 84%'] }),
+      node('okr-4', 'decision', 0, 450, { label: 'Goal Health Check', description: 'Are we on track?', mockLogs: ['Comparing progress against time elapsed in quarter', 'Target: 80%, Actual: 84% -> On Track', 'Engineering KR Target: 80%, Actual: 60% -> Off Track'] }),
+      node('okr-5a', 'tool', -150, 600, { label: 'Exec Alert', description: 'Slack DM to Leadership', mockLogs: ['[Slack API] Sending DM to CTO: "Engineering KR is 20% behind target. Risk: High"'] }),
+      node('okr-5b', 'task', 150, 600, { label: 'Generate Summary', description: 'Weekly digest', mockLogs: ['Aggregating all department progress into Markdown table'] }),
+      node('okr-6', 'end', 150, 750, { label: 'Company Update', description: 'Post to #general', mockLogs: ['[Slack API] Posting weekly OKR digest to #general-announcements'] })
+    ],
+    edges: [
+      edge('e-okr1', 'okr-1', 'okr-2'),
+      edge('e-okr2', 'okr-2', 'okr-3'),
+      edge('e-okr3', 'okr-3', 'okr-4'),
+      edge('e-okr4a', 'okr-4', 'okr-5a', 'Off Track', { color: '#ef4444' }),
+      edge('e-okr4b', 'okr-4', 'okr-5b', 'On Track', { color: '#10b981' }),
+      edge('e-okr5a', 'okr-5a', 'okr-5b', undefined, { dashed: true }),
+      edge('e-okr5b', 'okr-5b', 'okr-6')
+    ]
+  }
+}
+
 export function createSampleWorkflows(): Record<string, Workflow> {
   const samples = [
     ragPipeline(),
@@ -1634,7 +2049,18 @@ export function createSampleWorkflows(): Record<string, Workflow> {
     difySupportBot(),
     socialMediaScheduler(),
     abandonedCartRecovery(),
+    automatedCodeReview(),
+    cyberIncidentResponse(),
+    zeroBasedBudgeting(),
+    corporateWebinar(),
+    clientIntakeFlow(),
+    freelanceOnboarding(),
+    advancedDataEtl(),
+    b2bSalesProspecting(),
+    hrPayrollRun(),
+    generativeUiScaffold(),
+    contentTranslationPipeline(),
+    okrTrackingPipeline()
   ]
   return Object.fromEntries(samples.map((wf) => [wf.id, wf]))
 }
-
