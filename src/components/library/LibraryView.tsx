@@ -1,7 +1,9 @@
 import { memo, useMemo, useState } from 'react'
 import type { Workflow } from '../../types/workflow'
 import { useWorkflowStore } from '../../store/workflowStore'
-import { CopyIcon, EditIcon, PlusIcon, PresentIcon, TrashIcon } from '../common/Icon'
+import { CopyIcon, EditIcon, PlusIcon, PresentIcon, TrashIcon, SparklesIcon } from '../common/Icon'
+import { AiGenerateModal } from './AiGenerateModal'
+import { generateMockAiWorkflow } from '../../utils/mockAiGenerate'
 
 function formatDate(timestamp: number): string {
   return new Date(timestamp).toLocaleDateString(undefined, {
@@ -128,6 +130,7 @@ export function LibraryView() {
 
   const [search, setSearch] = useState('')
   const [activeCategory, setActiveCategory] = useState<'' | 'ai' | 'ielts' | 'esl' | 'custom'>('')
+  const [showAiModal, setShowAiModal] = useState(false)
 
   const sorted = useMemo(
     () => Object.values(workflows).sort((a, b) => b.updatedAt - a.updatedAt),
@@ -152,6 +155,12 @@ export function LibraryView() {
     openBuilder(id)
   }
 
+  const handleAiGenerate = (prompt: string) => {
+      const draft = generateMockAiWorkflow(prompt)
+      const id = createWorkflow(draft)
+      openBuilder(id)
+  }
+
   return (
     <div className="mx-auto h-full max-w-6xl overflow-y-auto p-6">
       <div className="mb-6 flex items-center justify-between">
@@ -161,13 +170,22 @@ export function LibraryView() {
             Build an IELTS or ESL workflow, then present it as an animated walkthrough.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleCreate}
-          className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
-        >
-          <PlusIcon /> New workflow
-        </button>
+        <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setShowAiModal(true)}
+              className="flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700"
+            >
+              <SparklesIcon /> Generate with AI
+            </button>
+            <button
+              type="button"
+              onClick={handleCreate}
+              className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+            >
+              <PlusIcon /> New workflow
+            </button>
+        </div>
       </div>
 
       {/* Search + Filter Bar */}
@@ -203,13 +221,15 @@ export function LibraryView() {
           {sorted.length === 0 ? (
             <>
               <p className="text-gray-500 dark:text-gray-400">No workflows yet.</p>
-              <button
-                type="button"
-                onClick={handleCreate}
-                className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
-              >
-                <PlusIcon /> Create your first workflow
-              </button>
+              <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCreate}
+                    className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                  >
+                    <PlusIcon /> Create your first workflow
+                  </button>
+              </div>
             </>
           ) : (
             <p className="text-gray-500 dark:text-gray-400">
@@ -231,6 +251,7 @@ export function LibraryView() {
           ))}
         </div>
       )}
+      {showAiModal && <AiGenerateModal onClose={() => setShowAiModal(false)} onGenerate={handleAiGenerate} />}
     </div>
   )
 }
