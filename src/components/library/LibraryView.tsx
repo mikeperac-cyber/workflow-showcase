@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import type { Workflow } from '../../types/workflow'
 import { useWorkflowStore } from '../../store/workflowStore'
 import { CopyIcon, EditIcon, PlusIcon, PresentIcon, TrashIcon, SparklesIcon } from '../common/Icon'
@@ -144,9 +144,29 @@ export function LibraryView() {
   const createWorkflow = useWorkflowStore((s) => s.createWorkflow)
   const openBuilder = useWorkflowStore((s) => s.openBuilder)
 
-  const [search, setSearch] = useState('')
-  const [activeCategory, setActiveCategory] = useState<'' | 'ai' | 'ielts' | 'esl' | 'productivity' | 'business' | 'student' | 'teacher' | 'custom'>('')
+  // Initialize state from URL if present
+  const [search, setSearch] = useState(() => new URLSearchParams(window.location.search).get('q') || '')
+  const [activeCategory, setActiveCategory] = useState<'' | 'ai' | 'ielts' | 'esl' | 'productivity' | 'business' | 'student' | 'teacher' | 'custom'>(() => {
+    const c = new URLSearchParams(window.location.search).get('category')
+    return (c as any) || ''
+  })
+  const [activeComplexity, setActiveComplexity] = useState(() => new URLSearchParams(window.location.search).get('complexity') || '')
+  const [activeTrigger, setActiveTrigger] = useState(() => new URLSearchParams(window.location.search).get('trigger') || '')
+  const [activeTool, setActiveTool] = useState(() => new URLSearchParams(window.location.search).get('tool') || '')
+
   const [showAiModal, setShowAiModal] = useState(false)
+
+  // Sync state to URL
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    if (search) url.searchParams.set('q', search); else url.searchParams.delete('q')
+    if (activeCategory) url.searchParams.set('category', activeCategory); else url.searchParams.delete('category')
+    if (activeComplexity) url.searchParams.set('complexity', activeComplexity); else url.searchParams.delete('complexity')
+    if (activeTrigger) url.searchParams.set('trigger', activeTrigger); else url.searchParams.delete('trigger')
+    if (activeTool) url.searchParams.set('tool', activeTool); else url.searchParams.delete('tool')
+
+    window.history.replaceState({}, '', url.toString())
+  }, [search, activeCategory, activeComplexity, activeTrigger, activeTool])
 
   const sorted = useMemo(
     () => Object.values(workflows).sort((a, b) => b.updatedAt - a.updatedAt),
@@ -162,9 +182,34 @@ export function LibraryView() {
         wf.description.toLowerCase().includes(q) ||
         wf.tags?.some((t) => t.toLowerCase().includes(q))
       const matchesCategory = !activeCategory || wf.category === activeCategory || (!wf.category && activeCategory === 'custom')
-      return matchesSearch && matchesCategory
+      const matchesComplexity = !activeComplexity || wf.complexity === activeComplexity
+      const matchesTrigger = !activeTrigger || (wf.trigger && wf.trigger.toLowerCase() === activeTrigger.toLowerCase())
+      const matchesTool = !activeTool || (wf.tools && wf.tools.some(t => t.toLowerCase() === activeTool.toLowerCase()))
+
+      return matchesSearch && matchesCategory && matchesComplexity && matchesTrigger && matchesTool
     })
-  }, [sorted, search, activeCategory])
+  }, [sorted, search, activeCategory, activeComplexity, activeTrigger, activeTool])
+
+  // Extract unique tools and triggers for dropdowns
+  const availableTools = useMemo(() => {
+    const tools = new Set<string>()
+    sorted.forEach(w => w.tools?.forEach(t => tools.add(t)))
+    return Array.from(tools).sort()
+  }, [sorted])
+
+  const availableTriggers = useMemo(() => {
+    const triggers = new Set<string>()
+    sorted.forEach(w => { if (w.trigger) triggers.add(w.trigger) })
+    return Array.from(triggers).sort()
+  }, [sorted])
+
+  const clearFilters = () => {
+    setSearch('')
+    setActiveCategory('')
+    setActiveComplexity('')
+    setActiveTrigger('')
+    setActiveTool('')
+  }
 
   const handleCreate = () => {
     const id = createWorkflow()
@@ -204,7 +249,7 @@ export function LibraryView() {
         </div>
       </div>
 
-      {/* Search + Filter Bar */}
+            {/* Search + Filter Bar */}
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <input
           type="search"
@@ -213,7 +258,40 @@ export function LibraryView() {
           onChange={(e) => setSearch(e.target.value)}
           className="h-9 min-w-56 flex-1 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-500 dark:focus:ring-blue-900"
         />
-        <div className="flex gap-1">
+
+        {/* Multi-Dimensional Filters */}
+        <select
+            value={activeComplexity}
+            onChange={e => setActiveComplexity(e.target.value)}
+            className="h-9 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+        >
+            <option value="">Complexity: All</option>
+            <option value="Starter">Starter</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+        </select>
+
+        <select
+            value={activeTrigger}
+            onChange={e => setActiveTrigger(e.target.value)}
+            className="h-9 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+        >
+            <option value="">Trigger: All</option>
+            {availableTriggers.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+
+        <select
+            value={activeTool}
+            onChange={e => setActiveTool(e.target.value)}
+            className="h-9 rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+        >
+            <option value="">Tool: All</option>
+            {availableTools.map(t => <option key={t} value={t}>{t}</option>)}
+        </select>
+      </div>
+
+      {/* Category Pills */}
+      <div className="mb-5 flex flex-wrap gap-1">
           {CATEGORY_FILTERS.map((f) => (
             <button
               key={f.value}
@@ -229,7 +307,6 @@ export function LibraryView() {
               {f.label}
             </button>
           ))}
-        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -252,7 +329,7 @@ export function LibraryView() {
               No workflows match your search.{' '}
               <button
                 type="button"
-                onClick={() => { setSearch(''); setActiveCategory('') }}
+                onClick={clearFilters}
                 className="text-blue-600 underline-offset-2 hover:underline dark:text-blue-400"
               >
                 Clear filters

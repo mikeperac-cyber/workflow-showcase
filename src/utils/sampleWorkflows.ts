@@ -35,6 +35,9 @@ function ieltWritingTask2(): Workflow {
   return {
     id: uid(),
     name: 'IELTS Writing Task 2 — Essay Process',
+    tools: ['Google Docs'],
+    trigger: 'Manual',
+    complexity: 'Starter',
     description: 'Step-by-step essay workflow from brainstorm to submission, with band-score targets at each stage.',
     category: 'ielts',
     tags: ['ielts', 'writing', 'task 2', 'essay'],
@@ -956,6 +959,9 @@ export function routerClassifierPattern(): Workflow {
   return {
     id: uid(),
     name: 'Router-Classifier Dynamic Multi-Agent Routing',
+    tools: ['OpenAI', 'Slack', 'Zendesk'],
+    trigger: 'Webhook',
+    complexity: 'Advanced',
     description:
       'Intelligent intent classification and execution routing: a user request enters a high-speed LLM classifier router and branches dynamically into Customer Support, Technical Specialist, or Fast General LLM.',
     category: 'ai',
@@ -1444,6 +1450,164 @@ export function contentCreationPipeline(): Workflow {
   }
 }
 
+
+// ─── 20. n8n Lead Generation Pipeline ──────────────────────────────────────
+export function n8nLeadGen(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'n8n Automated Lead Gen & Enrichment',
+    description: 'Capture leads from Typeform, enrich them with Clearbit, and push to HubSpot CRM.',
+    category: 'business',
+    tags: ['automation', 'n8n', 'lead-gen', 'crm'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Intermediate',
+    trigger: 'Webhook',
+    tools: ['n8n', 'Typeform', 'Clearbit', 'HubSpot'],
+    nodes: [
+      node('n8n-1', 'start', 0, 0, { label: 'Typeform Webhook', description: 'Triggered on new form submission', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[Webhook] Received POST request from Typeform', 'Extracted email: j.doe@example.com'] }),
+      node('n8n-2', 'tool', 0, 150, { label: 'Clearbit Enrichment', description: 'Fetch company data by email', apiEndpoint: 'https://person.clearbit.com/v2/people/find', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[Clearbit API] GET /v2/people/find?email=j.doe@example.com', 'Found Company: Example Corp, Industry: Software', 'Role: Director of Engineering'] }),
+      node('n8n-3', 'decision', 0, 300, { label: 'Lead Scoring', description: 'Is the lead qualified?', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Evaluating company size > 50', 'Evaluating industry match', 'Score: 85/100 (Qualified)'] }),
+      node('n8n-4a', 'task', -150, 450, { label: 'Add to Newsletter', description: 'Unqualified lead flow', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Pushing to Mailchimp subscriber list'] }),
+      node('n8n-4b', 'tool', 150, 450, { label: 'Push to HubSpot', description: 'Create Contact & Deal', apiEndpoint: 'https://api.hubapi.com/crm/v3/objects/contacts', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[HubSpot API] POST /crm/v3/objects/contacts', 'Contact ID 81923 created', 'Deal created in Pipeline: Inbound Sales'] }),
+      node('n8n-5', 'end', 150, 600, { label: 'Slack Notification', description: 'Alert sales team', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[Slack API] Sending message to #sales-inbound: "New hot lead: John Doe (Example Corp)"'] })
+    ],
+    edges: [
+      edge('e-n8n1', 'n8n-1', 'n8n-2'),
+      edge('e-n8n2', 'n8n-2', 'n8n-3'),
+      edge('e-n8n3a', 'n8n-3', 'n8n-4a', 'Score < 50', { color: '#f59e0b' }),
+      edge('e-n8n3b', 'n8n-3', 'n8n-4b', 'Score >= 50', { color: '#10b981' }),
+      edge('e-n8n4b', 'n8n-4b', 'n8n-5')
+    ]
+  }
+}
+
+// ─── 21. Make Employee Onboarding ──────────────────────────────────────────
+export function makeOnboarding(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Make.com IT Onboarding Automation',
+    description: 'Automates account provisioning in Google Workspace, Slack, and Jira when a new hire is added to BambooHR.',
+    category: 'business',
+    tags: ['automation', 'make', 'hr', 'it'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'App Event',
+    tools: ['Make', 'BambooHR', 'Google Workspace', 'Slack', 'Jira'],
+    nodes: [
+      node('mk-1', 'start', 0, 0, { label: 'BambooHR Trigger', description: 'New Employee Added', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Polling BambooHR API... New Employee ID: 1042', 'Name: Alice Smith, Dept: Engineering'] }),
+      node('mk-2', 'tool', 0, 150, { label: 'Google Workspace', description: 'Create Email Account', apiEndpoint: 'https://admin.googleapis.com/admin/directory/v1/users', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Creating user: asmith@company.com', 'Generating temporary password', 'Assigning organizational unit: /Engineering'] }),
+      node('mk-3', 'tool', 0, 300, { label: 'Slack Provisioning', description: 'Invite to Workspace & Channels', apiEndpoint: 'https://slack.com/api/admin.users.invite', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Inviting asmith@company.com to Slack', 'Adding to channels: #general, #engineering, #dev-announcements'] }),
+      node('mk-4', 'tool', 0, 450, { label: 'Jira Account', description: 'Create Atlassian Account', apiEndpoint: 'https://your-domain.atlassian.net/rest/api/3/user', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['POST /rest/api/3/user', 'Assigning "Developer" role to asmith@company.com'] }),
+      node('mk-5', 'end', 0, 600, { label: 'Send Welcome Email', description: 'Email to personal address', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Sending welcome packet to personal email with temporary login credentials'] })
+    ],
+    edges: [
+      edge('e-mk1', 'mk-1', 'mk-2'),
+      edge('e-mk2', 'mk-2', 'mk-3'),
+      edge('e-mk3', 'mk-3', 'mk-4'),
+      edge('e-mk4', 'mk-4', 'mk-5')
+    ]
+  }
+}
+
+// ─── 22. Dify Support Chatbot ──────────────────────────────────────────────
+export function difySupportBot(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Dify.ai Customer Support Agent',
+    description: 'A conversational agent that searches knowledge bases and creates tickets if unresolved.',
+    category: 'business',
+    tags: ['ai', 'dify', 'support', 'chatbot', 'rag'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Advanced',
+    trigger: 'Webhook',
+    tools: ['Dify', 'OpenAI', 'Zendesk'],
+    nodes: [
+      node('dy-1', 'start', 0, 0, { label: 'User Message', description: 'Input via chat widget', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Received message: "How do I reset my API key?"'] }),
+      node('dy-2', 'tool', 0, 150, { label: 'Knowledge Retrieval', description: 'Vector Search', apiEndpoint: 'https://api.dify.ai/v1/datasets', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Searching vector DB for: "reset API key"', 'Found 3 relevant document chunks in "Developer Docs"'] }),
+      node('dy-3', 'agent', 0, 300, { label: 'Response Generation', description: 'LLM synthesizes answer', model: 'gpt-4o', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Prompting GPT-4o with context...', 'Generated response: "To reset your API key, navigate to Settings > Developer and click Regenerate."'] }),
+      node('dy-4', 'decision', 0, 450, { label: 'User Satisfied?', description: 'Did this resolve the issue?', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Waiting for user feedback...', 'User clicked "No, I need human help."'] }),
+      node('dy-5a', 'end', -150, 600, { label: 'End Chat', description: 'Conversation closed', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['User satisfaction confirmed. Ending session.'] }),
+      node('dy-5b', 'tool', 150, 600, { label: 'Create Zendesk Ticket', description: 'Escalate to human', apiEndpoint: 'https://zendesk.com/api/v2/tickets.json', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[Zendesk API] Creating ticket with chat transcript...', 'Ticket #91823 created and assigned to Tier 1 Support.'] })
+    ],
+    edges: [
+      edge('e-dy1', 'dy-1', 'dy-2'),
+      edge('e-dy2', 'dy-2', 'dy-3'),
+      edge('e-dy3', 'dy-3', 'dy-4'),
+      edge('e-dy4a', 'dy-4', 'dy-5a', 'Yes', { color: '#10b981' }),
+      edge('e-dy4b', 'dy-4', 'dy-5b', 'No', { color: '#f43f5e' })
+    ]
+  }
+}
+
+// ─── 23. Daily Social Media Scheduler ──────────────────────────────────────
+export function socialMediaScheduler(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Automated Daily Social Posting',
+    description: 'Pulls the daily post from an Airtable content calendar and publishes to Twitter and LinkedIn.',
+    category: 'productivity',
+    tags: ['automation', 'make', 'social-media', 'airtable'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Starter',
+    trigger: 'Schedule',
+    tools: ['Make', 'Airtable', 'Twitter', 'LinkedIn'],
+    nodes: [
+      node('sm-1', 'start', 0, 0, { label: 'Cron Trigger', description: 'Runs daily at 8:00 AM', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Triggered by cron: 0 8 * * *', 'Executing daily social sync'] }),
+      node('sm-2', 'tool', 0, 150, { label: 'Fetch Airtable Record', description: 'Get today’s approved post', apiEndpoint: 'https://api.airtable.com/v0/meta/bases', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[Airtable API] Searching for Date = TODAY() AND Status = Approved', 'Found 1 record: "Top 5 Automation Tips"'] }),
+      node('sm-3', 'task', 0, 300, { label: 'Format Text', description: 'Adjust for platform limits', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Formatting text for Twitter (checking 280 char limit)', 'Formatting text for LinkedIn (preserving line breaks)'] }),
+      node('sm-4a', 'tool', -150, 450, { label: 'Post to Twitter', description: 'Twitter API', apiEndpoint: 'https://api.twitter.com/2/tweets', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[Twitter API] POST /2/tweets', 'Tweet successfully published! ID: 189283719'] }),
+      node('sm-4b', 'tool', 150, 450, { label: 'Post to LinkedIn', description: 'LinkedIn API', apiEndpoint: 'https://api.linkedin.com/v2/ugcPosts', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[LinkedIn API] POST /v2/ugcPosts', 'LinkedIn post successfully published!'] }),
+      node('sm-5', 'end', 0, 600, { label: 'Update Airtable Status', description: 'Mark as "Published"', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[Airtable API] PATCH record status -> "Published"'] })
+    ],
+    edges: [
+      edge('e-sm1', 'sm-1', 'sm-2'),
+      edge('e-sm2', 'sm-2', 'sm-3'),
+      edge('e-sm3a', 'sm-3', 'sm-4a'),
+      edge('e-sm3b', 'sm-3', 'sm-4b'),
+      edge('e-sm4a', 'sm-4a', 'sm-5'),
+      edge('e-sm4b', 'sm-4b', 'sm-5')
+    ]
+  }
+}
+
+// ─── 24. E-commerce Abandoned Cart Recovery ────────────────────────────────
+export function abandonedCartRecovery(): Workflow {
+  const now = Date.now()
+  return {
+    id: uid(),
+    name: 'Shopify Abandoned Cart Recovery',
+    description: 'Trigger an SMS and Email sequence when a user leaves items in their Shopify cart.',
+    category: 'business',
+    tags: ['automation', 'shopify', 'ecommerce', 'klaviyo', 'twilio'],
+    createdAt: now,
+    updatedAt: now,
+    complexity: 'Intermediate',
+    trigger: 'Event',
+    tools: ['Shopify', 'Klaviyo', 'Twilio'],
+    nodes: [
+      node('ac-1', 'start', 0, 0, { label: 'Shopify Event', description: 'Cart Abandoned', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[Shopify Webhook] Checkout created but not completed after 1 hour', 'Cart ID: 99182, Total: $120.00'] }),
+      node('ac-2', 'tool', 0, 150, { label: 'Send Klaviyo Email 1', description: 'Reminder (1 hr later)', apiEndpoint: 'https://a.klaviyo.com/api/v1/campaign', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[Klaviyo API] Sending template "Forgot Something?" to user email', 'Email sent successfully.'] }),
+      node('ac-3', 'decision', 0, 300, { label: 'Did they purchase?', description: 'Check status after 24hrs', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['Waiting 24 hours...', 'Checking Shopify order status...', 'Status: Unpaid'] }),
+      node('ac-4a', 'end', -150, 450, { label: 'Stop Sequence', description: 'Purchase completed', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['User purchased! Halting recovery sequence.'] }),
+      node('ac-4b', 'tool', 150, 450, { label: 'Send Twilio SMS', description: '10% Discount Offer', apiEndpoint: 'https://api.twilio.com/2010-04-01/Accounts/Messages.json', details: 'Detailed execution step for the workflow simulation.', mockLogs: ['[Twilio API] Sending SMS: "Hey! Complete your order for 10% off with code SAVE10. [Link]"', 'SMS delivered.'] })
+    ],
+    edges: [
+      edge('e-ac1', 'ac-1', 'ac-2'),
+      edge('e-ac2', 'ac-2', 'ac-3'),
+      edge('e-ac3a', 'ac-3', 'ac-4a', 'Yes', { color: '#10b981' }),
+      edge('e-ac3b', 'ac-3', 'ac-4b', 'No', { color: '#f43f5e' })
+    ]
+  }
+}
+
 export function createSampleWorkflows(): Record<string, Workflow> {
   const samples = [
     ragPipeline(),
@@ -1465,6 +1629,11 @@ export function createSampleWorkflows(): Record<string, Workflow> {
     flippedClassroom(),
     onlineCourseLaunch(),
     contentCreationPipeline(),
+    n8nLeadGen(),
+    makeOnboarding(),
+    difySupportBot(),
+    socialMediaScheduler(),
+    abandonedCartRecovery(),
   ]
   return Object.fromEntries(samples.map((wf) => [wf.id, wf]))
 }

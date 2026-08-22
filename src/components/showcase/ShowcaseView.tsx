@@ -11,6 +11,8 @@ import { BackIcon, EditIcon } from '../common/Icon'
 import { ExportMenu } from '../common/ExportMenu'
 import { NodeDetailPanel } from './NodeDetailPanel'
 import { PlaybackControls } from './PlaybackControls'
+import { MockTerminal } from './MockTerminal'
+
 
 const nodeTypes: NodeTypes = { workflow: WorkflowNodeComponent }
 
@@ -113,9 +115,12 @@ function ShowcaseCanvas({ workflow }: { workflow: Workflow }) {
           </div>
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-10 flex justify-center px-4">
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-10 flex flex-col items-center justify-end px-4 gap-4">
           <PlaybackControls playback={playback} />
+          <MockTerminal playback={playback} />
         </div>
+
       </div>
       <NodeDetailPanel
         workflow={workflow}
