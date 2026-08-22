@@ -220,15 +220,15 @@ export function runWorkflowVerification(): boolean {
 
   // ─── Suite 1: Sample Workflows Registration & Count ────────────────────────
   runner.suite('1. Sample Workflows Registration & Count', () => {
-    runner.test('createSampleWorkflows returns exactly 19 sample workflows', () => {
+    runner.test('createSampleWorkflows returns exactly 24 sample workflows', () => {
       runner.assertEqual(
         workflows.length,
-        19,
+        24,
         'Expected exactly 19 workflows',
       )
     })
 
-    runner.test('Category breakdown has exactly 3 AI, 4 IELTS, 2 ESL, 3 Productivity, 3 Business, 2 Student, and 2 Teacher workflows', () => {
+    runner.test('Category breakdown has exactly 3 AI, 4 IELTS, 2 ESL, 4 Productivity, 7 Business, 2 Student, and 2 Teacher workflows', () => {
       const ai = workflows.filter((w) => w.category === 'ai')
       const ielts = workflows.filter((w) => w.category === 'ielts')
       const esl = workflows.filter((w) => w.category === 'esl')
@@ -241,11 +241,11 @@ export function runWorkflowVerification(): boolean {
         ai.length === 3 &&
         ielts.length === 4 &&
         esl.length === 2 &&
-        prod.length === 3 &&
-        bus.length === 3 &&
+        prod.length === 4 &&
+        bus.length === 7 &&
         stu.length === 2 &&
         teach.length === 2,
-        `Expected [3, 4, 2, 3, 3, 2, 2] split, got AI:${ai.length}, IELTS:${ielts.length}, ESL:${esl.length}, PROD:${prod.length}, BUS:${bus.length}, STU:${stu.length}, TEACH:${teach.length}`
+        `Expected [3, 4, 2, 4, 7, 2, 2] split, got AI:${ai.length}, IELTS:${ielts.length}, ESL:${esl.length}, PROD:${prod.length}, BUS:${bus.length}, STU:${stu.length}, TEACH:${teach.length}`
       )
     })
 
@@ -320,7 +320,7 @@ export function runWorkflowVerification(): boolean {
 
   // ─── Suite 3: Node Types & Specialized AI Configurations ───────────────────
   runner.suite('3. Node Types & Specialized AI Configurations', () => {
-    runner.test('All nodes in all 19 workflows have valid nodeType values', () => {
+    runner.test('All nodes in all 24 workflows have valid nodeType values', () => {
       for (const w of workflows) {
         for (const n of w.nodes) {
           runner.assert(
@@ -511,7 +511,7 @@ export function runWorkflowVerification(): boolean {
 
   // ─── Suite 5: Metadata, Metrics & Content Completeness ─────────────────────
   runner.suite('5. Metadata, Metrics & Content Completeness', () => {
-    runner.test('All 19 workflows have complete metadata (name, description, category, tags)', () => {
+    runner.test('All 24 workflows have complete metadata (name, description, category, tags)', () => {
       for (const w of workflows) {
         runner.assert(typeof w.name === 'string' && w.name.trim().length > 0, `Workflow name must be non-empty (${w.id})`)
         runner.assert(

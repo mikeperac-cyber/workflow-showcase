@@ -4,7 +4,8 @@ import type { Workflow, WorkflowNode } from '../../types/workflow'
 import { useThemeStore } from '../../store/themeStore'
 import { exportFlowImage } from '../../utils/exportImage'
 import { exportFlowPdf } from '../../utils/exportPdf'
-import { DownloadIcon, LinkIcon } from './Icon'
+import { generateN8nBlueprint, generateMakeBlueprint } from '../../utils/exportBlueprints'
+import { DownloadIcon, LinkIcon, CopyIcon } from './Icon'
 import { ShareModal } from './ShareModal'
 
 const itemClass =
@@ -17,6 +18,7 @@ const itemClass =
 export function ExportMenu({ workflow }: { workflow: Workflow }) {
   const [open, setOpen] = useState(false)
   const [showShare, setShowShare] = useState(false)
+  const [copiedBlueprint, setCopiedBlueprint] = useState<'n8n' | 'make' | null>(null)
   const ref = useRef<HTMLDivElement>(null)
   const { getNodes } = useReactFlow<WorkflowNode>()
   const theme = useThemeStore((s) => s.theme)
@@ -29,6 +31,19 @@ export function ExportMenu({ workflow }: { workflow: Workflow }) {
     document.addEventListener('mousedown', onClick)
     return () => document.removeEventListener('mousedown', onClick)
   }, [open])
+
+
+  const copyBlueprint = async (type: 'n8n' | 'make') => {
+    const json = type === 'n8n' ? generateN8nBlueprint(workflow) : generateMakeBlueprint(workflow)
+    try {
+      await navigator.clipboard.writeText(json)
+      setCopiedBlueprint(type)
+      setTimeout(() => { setCopiedBlueprint(null); setOpen(false) }, 1500)
+    } catch {
+      window.prompt(`Copy this ${type} blueprint:`, json)
+      setOpen(false)
+    }
+  }
 
   const background = theme === 'dark' ? '#030712' : '#f9fafb'
 
@@ -61,6 +76,13 @@ export function ExportMenu({ workflow }: { workflow: Workflow }) {
             </button>
             <button type="button" className={itemClass} onClick={() => exportImage('pdf')}>
               <DownloadIcon /> Export as PDF
+            </button>
+            <div className="my-1 border-t border-gray-100 dark:border-gray-700"></div>
+            <button type="button" className={itemClass} onClick={() => copyBlueprint('n8n')}>
+              <CopyIcon /> {copiedBlueprint === 'n8n' ? 'Copied n8n!' : 'Copy n8n Blueprint'}
+            </button>
+            <button type="button" className={itemClass} onClick={() => copyBlueprint('make')}>
+              <CopyIcon /> {copiedBlueprint === 'make' ? 'Copied Make!' : 'Copy Make Blueprint'}
             </button>
             <div className="my-1 border-t border-gray-100 dark:border-gray-700"></div>
             <button type="button" className={itemClass} onClick={() => { setOpen(false); setShowShare(true); }}>

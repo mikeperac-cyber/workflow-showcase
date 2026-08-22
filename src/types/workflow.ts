@@ -54,6 +54,8 @@ export interface WorkflowNodeData extends Record<string, unknown> {
   systemPrompt?: string
   /** User message template with variables (for 'prompt') */
   userPrompt?: string
+  /** Pre-scripted mock logs to simulate live terminal output during showcase */
+  mockLogs?: string[]
 }
 
 export type EdgeLineStyle = 'smooth' | 'bezier' | 'straight' | 'step'
@@ -92,6 +94,12 @@ export interface Workflow {
   tags?: string[]
   /** High-level category shown as a color accent on library cards. */
   category?: 'ai' | 'ielts' | 'esl' | 'productivity' | 'business' | 'student' | 'teacher' | 'custom'
+  /** Tools/Stacks used in the workflow for multidimensional filtering */
+  tools?: string[]
+  /** Trigger type (e.g., 'Webhook', 'Schedule', 'Event') */
+  trigger?: string
+  /** Complexity tier of the workflow */
+  complexity?: 'Starter' | 'Intermediate' | 'Advanced'
 }
 
 export type View = 'library' | 'builder' | 'showcase'

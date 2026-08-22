@@ -1,3 +1,4 @@
+import { ROICalculator } from './ROICalculator'
 import { useState } from 'react'
 import type { Workflow, WorkflowNode } from '../../types/workflow'
 import { NODE_TYPE_META, nodeColor } from '../canvas/shared'
@@ -669,6 +670,11 @@ export function NodeDetailPanel({ workflow, node, stepIndex, stepCount, onPlay }
             })}
           </div>
         </div>
+      )}
+
+      {/* ── ROI Calculator ─────────────────────────────────────── */}
+      {(!node || node.data.nodeType === 'end' || node.data.nodeType === 'start') && (
+        <ROICalculator workflow={workflow} />
       )}
     </aside>
   )
