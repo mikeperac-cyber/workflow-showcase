@@ -36,7 +36,7 @@ interface WorkflowStore {
   openShowcase: (id: string) => void
 
   // workflow CRUD
-  createWorkflow: () => string
+  createWorkflow: (initialWorkflow?: Partial<Workflow>) => string
   deleteWorkflow: (id: string) => void
   duplicateWorkflow: (id: string) => void
   updateWorkflowMeta: (id: string, patch: Partial<Pick<Workflow, 'name' | 'description' | 'tags' | 'category'>>) => void
@@ -80,15 +80,17 @@ export const useWorkflowStore = create<WorkflowStore>()(
         openBuilder: (id) => set({ view: 'builder', activeId: id }),
         openShowcase: (id) => set({ view: 'showcase', activeId: id }),
 
-        createWorkflow: () => {
+        createWorkflow: (initialWorkflow) => {
           const now = Date.now()
           const wf: Workflow = {
             id: uid(),
-            name: 'Untitled Workflow',
-            description: '',
+            name: initialWorkflow?.name || 'Untitled Workflow',
+            description: initialWorkflow?.description || '',
             createdAt: now,
             updatedAt: now,
-            nodes: [
+            category: initialWorkflow?.category || 'custom',
+            tags: initialWorkflow?.tags || [],
+            nodes: initialWorkflow?.nodes || [
               {
                 id: uid(),
                 type: 'workflow',
@@ -96,7 +98,7 @@ export const useWorkflowStore = create<WorkflowStore>()(
                 data: { nodeType: 'start', label: 'Start', duration: 2000 },
               },
             ],
-            edges: [],
+            edges: initialWorkflow?.edges || [],
           }
           set((s) => ({ workflows: { ...s.workflows, [wf.id]: wf } }))
           return wf.id

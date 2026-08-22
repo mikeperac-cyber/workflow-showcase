@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Workflow, WorkflowNode } from '../types/workflow'
+import { playTTS, stopTTS } from '../utils/tts'
 
 export const PLAYBACK_SPEEDS = [0.5, 1, 2] as const
 
@@ -57,11 +58,14 @@ export interface Playback {
   isPlaying: boolean
   speed: number
   progress: number
+  ttsEnabled: boolean
+  toggleTTS: () => void
   toggle: () => void
   next: () => void
   prev: () => void
   restart: () => void
   cycleSpeed: () => void
+  jumpToNode: (nodeId: string) => void
 }
 
 export function usePlayback(workflow: Workflow): Playback {
@@ -76,11 +80,13 @@ export function usePlayback(workflow: Workflow): Playback {
   const [currentIndex, setCurrentIndex] = useState(-1)
   const [isPlaying, setIsPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
+  const [ttsEnabled, setTtsEnabled] = useState(false)
 
   // Reset playback whenever a different workflow is opened.
   useEffect(() => {
     setCurrentIndex(-1)
     setIsPlaying(false)
+    stopTTS()
   }, [workflow.id])
 
   useEffect(() => {
@@ -89,15 +95,38 @@ export function usePlayback(workflow: Workflow): Playback {
     setIsPlaying(false)
   }, [currentIndex, steps.length])
 
+  // Handle TTS
+  useEffect(() => {
+    if (currentIndex >= 0 && currentIndex < steps.length && ttsEnabled) {
+      const nodeId = steps[currentIndex]
+      const node = nodesById.get(nodeId)
+      if (node?.data.description || node?.data.label) {
+        playTTS(node.data.description || node.data.label)
+      }
+    } else {
+        stopTTS()
+    }
+  }, [currentIndex, steps, nodesById, ttsEnabled])
+
+
   useEffect(() => {
     if (!isPlaying) return
     if (currentIndex >= steps.length - 1) {
       setIsPlaying(false)
       return
     }
+    const currentId = currentIndex >= 0 ? steps[currentIndex] : null
+    const currentNode = currentId ? nodesById.get(currentId) : null
+
+    // Pause at decision nodes
+    if (currentNode?.data.nodeType === 'decision') {
+        setIsPlaying(false)
+        return
+    }
+
     const nextId = steps[currentIndex + 1]
-    const node = nodesById.get(nextId)
-    const dwell = (node?.data.duration ?? 2000) / speed
+    const nextNode = nodesById.get(nextId)
+    const dwell = (nextNode?.data.duration ?? 2000) / speed
     const timer = setTimeout(
       () => setCurrentIndex((i) => Math.min(i + 1, steps.length - 1)),
       dwell,
@@ -123,6 +152,8 @@ export function usePlayback(workflow: Workflow): Playback {
     isPlaying,
     speed,
     progress: steps.length > 0 ? Math.max(0, currentIndex + 1) / steps.length : 0,
+    ttsEnabled,
+    toggleTTS: () => setTtsEnabled(prev => !prev),
     toggle: () => {
       if (steps.length === 0) return
       if (isPlaying) {
@@ -149,5 +180,12 @@ export function usePlayback(workflow: Workflow): Playback {
         const idx = PLAYBACK_SPEEDS.indexOf(s as (typeof PLAYBACK_SPEEDS)[number])
         return PLAYBACK_SPEEDS[(idx + 1) % PLAYBACK_SPEEDS.length]
       }),
+    jumpToNode: (nodeId: string) => {
+        const index = steps.indexOf(nodeId)
+        if (index !== -1) {
+            setIsPlaying(false)
+            setCurrentIndex(index)
+        }
+    }
   }
 }

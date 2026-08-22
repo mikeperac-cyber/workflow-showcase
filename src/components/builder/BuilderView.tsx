@@ -7,11 +7,12 @@ import { useActiveWorkflow, useSelectedNodeId, useWorkflowStore } from '../../st
 import { useThemeStore } from '../../store/themeStore'
 import { WorkflowNodeComponent } from '../canvas/WorkflowNode'
 import { decorateEdge, defaultEdgeOptions } from '../canvas/shared'
-import { BackIcon, PresentIcon, TrashIcon } from '../common/Icon'
+import { BackIcon, PresentIcon, TrashIcon, PlusIcon } from '../common/Icon'
 import { ExportMenu } from '../common/ExportMenu'
 import { EdgeEditorPanel } from './EdgeEditorPanel'
 import { NodeEditorPanel } from './NodeEditorPanel'
 import { DND_MIME, NodePalette } from './NodePalette'
+import { getAutoLayoutNodes } from '../../utils/autoLayout'
 
 const nodeTypes: NodeTypes = { workflow: WorkflowNodeComponent }
 
@@ -29,6 +30,13 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
   const updateWorkflowMeta = useWorkflowStore((s) => s.updateWorkflowMeta)
   const selectedNodeId = useSelectedNodeId()
   const deleteNode = useWorkflowStore((s) => s.deleteNode)
+  const { setNodes, getNodes, getEdges, fitView } = useReactFlow()
+
+  const handleAutoLayout = () => {
+    const layoutedNodes = getAutoLayoutNodes(getNodes(), getEdges(), 'TB')
+    setNodes([...layoutedNodes])
+    window.requestAnimationFrame(() => fitView())
+  }
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start gap-2 p-3">
@@ -44,14 +52,14 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
         <input
           value={workflow.name}
           onChange={(e) => updateWorkflowMeta(workflow.id, { name: e.target.value })}
-          className="w-56 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold outline-none transition focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800"
+          className="w-56 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-semibold outline-none transition focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           aria-label="Workflow name"
         />
         <input
           value={workflow.description}
           onChange={(e) => updateWorkflowMeta(workflow.id, { description: e.target.value })}
           placeholder="Add a description…"
-          className="w-64 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm outline-none transition focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800"
+          className="w-64 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm outline-none transition focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           aria-label="Workflow description"
         />
         {/* Category selector */}
@@ -81,6 +89,13 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
         </div>
       </div>
       <div className="pointer-events-auto flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleAutoLayout}
+          className="flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium transition hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200"
+        >
+          <PlusIcon /> Auto Layout
+        </button>
         {selectedNodeId && (
           <button
             type="button"
