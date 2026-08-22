@@ -182,7 +182,7 @@ export function LibraryView() {
         wf.description.toLowerCase().includes(q) ||
         wf.tags?.some((t) => t.toLowerCase().includes(q))
       const matchesCategory = !activeCategory || wf.category === activeCategory || (!wf.category && activeCategory === 'custom')
-      const matchesComplexity = !activeComplexity || wf.complexity === activeComplexity
+      const matchesComplexity = !activeComplexity || (wf.complexity && wf.complexity.toLowerCase() === activeComplexity.toLowerCase())
       const matchesTrigger = !activeTrigger || (wf.trigger && wf.trigger.toLowerCase() === activeTrigger.toLowerCase())
       const matchesTool = !activeTool || (wf.tools && wf.tools.some(t => t.toLowerCase() === activeTool.toLowerCase()))
 
