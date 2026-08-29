@@ -81,6 +81,7 @@ export function usePlayback(workflow: Workflow): Playback {
   const [isPlaying, setIsPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
   const [ttsEnabled, setTtsEnabled] = useState(false)
+  const [progress, setProgress] = useState(0)
 
   // Reset playback whenever a different workflow is opened.
   useEffect(() => {
@@ -110,7 +111,11 @@ export function usePlayback(workflow: Workflow): Playback {
 
 
   useEffect(() => {
-    if (!isPlaying) return
+    const completed = steps.length > 0 ? Math.max(0, currentIndex + 1) / steps.length : 0
+    if (!isPlaying) {
+      setProgress(completed)
+      return
+    }
     if (currentIndex >= steps.length - 1) {
       setIsPlaying(false)
       return
@@ -125,13 +130,21 @@ export function usePlayback(workflow: Workflow): Playback {
     }
 
     const nextId = steps[currentIndex + 1]
-    const nextNode = nodesById.get(nextId)
-    const dwell = (nextNode?.data.duration ?? 2000) / speed
-    const timer = setTimeout(
-      () => setCurrentIndex((i) => Math.min(i + 1, steps.length - 1)),
-      dwell,
-    )
-    return () => clearTimeout(timer)
+    const node = nodesById.get(nextId)
+    const dwell = (node?.data.duration ?? 2000) / speed
+    const startedAt = performance.now()
+    let frame = 0
+    const tick = (now: number) => {
+      const elapsed = now - startedAt
+      setProgress(Math.min(1, completed + Math.min(1, elapsed / dwell) / steps.length))
+      if (elapsed >= dwell) {
+        setCurrentIndex((i) => Math.min(i + 1, steps.length - 1))
+        return
+      }
+      frame = requestAnimationFrame(tick)
+    }
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
   }, [isPlaying, currentIndex, speed, steps, nodesById])
 
   const visited = useMemo(
@@ -151,9 +164,9 @@ export function usePlayback(workflow: Workflow): Playback {
     visited,
     isPlaying,
     speed,
-    progress: steps.length > 0 ? Math.max(0, currentIndex + 1) / steps.length : 0,
     ttsEnabled,
-    toggleTTS: () => setTtsEnabled(prev => !prev),
+    progress,
+    toggleTTS: () => setTtsEnabled((previous) => !previous),
     toggle: () => {
       if (steps.length === 0) return
       if (isPlaying) {

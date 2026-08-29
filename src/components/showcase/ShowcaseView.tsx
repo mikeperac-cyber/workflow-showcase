@@ -81,8 +81,9 @@ function ShowcaseCanvas({ workflow }: { workflow: Workflow }) {
           nodesDraggable={false}
           nodesConnectable={false}
           elementsSelectable={false}
+          onlyRenderVisibleElements
           defaultEdgeOptions={defaultEdgeOptions}
-          colorMode={theme}
+          colorMode={theme === 'contrast' ? 'dark' : theme}
           fitView
         >
           <Background gap={18} />

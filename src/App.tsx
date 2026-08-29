@@ -1,11 +1,14 @@
-import { useEffect, useRef } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import { useWorkflowStore } from './store/workflowStore'
 import { useApplyTheme } from './store/themeStore'
 import { getSharedWorkflowFromLocation } from './utils/shareLink'
-import { BuilderView } from './components/builder/BuilderView'
-import { LibraryView } from './components/library/LibraryView'
-import { ShowcaseView } from './components/showcase/ShowcaseView'
 import { ThemeToggle } from './components/common/ThemeToggle'
+import { ErrorBoundary } from './components/common/ErrorBoundary'
+import { AuthControl } from './auth/AuthProvider'
+
+const BuilderView = lazy(async () => ({ default: (await import('./components/builder/BuilderView')).BuilderView }))
+const LibraryView = lazy(async () => ({ default: (await import('./components/library/LibraryView')).LibraryView }))
+const ShowcaseView = lazy(async () => ({ default: (await import('./components/showcase/ShowcaseView')).ShowcaseView }))
 
 function Header() {
   const view = useWorkflowStore((s) => s.view)
@@ -47,7 +50,8 @@ function Header() {
           · IELTS &amp; ESL Workflow Builder
         </span>
       )}
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-2">
+        <AuthControl />
         <ThemeToggle />
       </div>
     </header>
@@ -81,9 +85,13 @@ export default function App() {
     <div className="flex h-full flex-col">
       <Header />
       <main className="min-h-0 flex-1">
-        {view === 'library' && <LibraryView />}
-        {view === 'builder' && <BuilderView />}
-        {view === 'showcase' && <ShowcaseView />}
+        <ErrorBoundary name={view}>
+          <Suspense fallback={<div className="p-6 text-sm text-gray-500">Loading {view}…</div>}>
+            {view === 'library' && <LibraryView />}
+            {view === 'builder' && <BuilderView />}
+            {view === 'showcase' && <ShowcaseView />}
+          </Suspense>
+        </ErrorBoundary>
       </main>
     </div>
   )

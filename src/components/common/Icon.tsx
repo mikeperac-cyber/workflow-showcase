@@ -93,6 +93,20 @@ export const BackIcon = (props: IconProps) => (
   </svg>
 )
 
+export const UndoIcon = (props: IconProps) => (
+  <svg {...base(props)} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 7 4 12l5 5" />
+    <path d="M4 12h10a6 6 0 1 1 0 12h-1" transform="translate(0 -6)" />
+  </svg>
+)
+
+export const RedoIcon = (props: IconProps) => (
+  <svg {...base(props)} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+    <path d="m15 7 5 5-5 5" />
+    <path d="M20 12H10a6 6 0 1 0 0 12h1" transform="translate(0 -6)" />
+  </svg>
+)
+
 export const PresentIcon = (props: IconProps) => (
   <svg {...base(props)} fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="4" width="20" height="13" rx="2" />

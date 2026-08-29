@@ -3,6 +3,7 @@ import { useWorkflowStore } from '../../store/workflowStore'
 import { NODE_TYPE_META, nodeColor } from '../canvas/shared'
 import { ColorSwatches } from '../common/ColorSwatches'
 import { PlusIcon, TrashIcon } from '../common/Icon'
+import { AI_METRIC_PRESETS } from './aiMetricPresets'
 
 const inputClass =
   'w-full rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:border-gray-700 dark:bg-gray-800 dark:focus:border-blue-500 dark:focus:ring-blue-900'
@@ -16,17 +17,6 @@ const EXAM_TIMER_PRESETS = [
   { label: 'Long turn', value: '2 min' },
   { label: 'Listening', value: '30 min' },
   { label: 'Reading', value: '60 min' },
-]
-
-/** Preset AI metrics for quick insertion in AI multi-agent workflows. */
-export const AI_METRIC_PRESETS = [
-  { label: 'temperature', value: '0.7' },
-  { label: 'max_tokens', value: '2048' },
-  { label: 'latency', value: '320ms' },
-  { label: 'cost', value: '$0.002' },
-  { label: 'token_count', value: '1.2k' },
-  { label: 'accuracy', value: '98.5%' },
-  { label: 'alignment', value: '0.94' },
 ]
 
 const AI_MODEL_OPTIONS = [

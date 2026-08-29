@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Handle, Position } from '@xyflow/react'
 import type { NodeProps } from '@xyflow/react'
 import type { WorkflowNode } from '../../types/workflow'
@@ -12,7 +13,7 @@ import { NODE_TYPE_META, nodeColor } from './shared'
  * The 'note' type renders as a yellow sticky-note card without connection handles
  * (decorative by default), perfect for teacher annotations and IELTS tips.
  */
-export function WorkflowNodeComponent({ data, selected }: NodeProps<WorkflowNode>) {
+export const WorkflowNodeComponent = memo(function WorkflowNodeComponent({ data, selected }: NodeProps<WorkflowNode>) {
   const meta = NODE_TYPE_META[data.nodeType]
   const color = nodeColor(data)
   const playback = data.playback ?? 'upcoming'
@@ -150,4 +151,4 @@ export function WorkflowNodeComponent({ data, selected }: NodeProps<WorkflowNode
       <Handle type="source" position={Position.Bottom} id="bottom-source" className="w-3 h-3 !bg-blue-500" />
     </div>
   )
-}
+})

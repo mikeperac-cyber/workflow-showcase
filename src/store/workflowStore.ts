@@ -25,8 +25,16 @@ const DEFAULT_NODE_LABELS: Record<WorkflowNodeType, string> = {
   prompt: 'Prompt Template',
 }
 
+const HISTORY_LIMIT = 100
+
+interface WorkflowHistory {
+  past: Workflow[]
+  future: Workflow[]
+}
+
 interface WorkflowStore {
   workflows: Record<string, Workflow>
+  history: Record<string, WorkflowHistory>
   view: View
   activeId: string | null
 
@@ -48,9 +56,16 @@ interface WorkflowStore {
   onConnect: (connection: Connection) => void
   addNode: (nodeType: WorkflowNodeType, position?: XYPosition) => void
   deleteNode: (nodeId: string) => void
+  deleteSelectedNodes: () => void
   updateNodeData: (nodeId: string, patch: Partial<WorkflowNodeData>) => void
   updateEdge: (edgeId: string, patch: EdgePatch) => void
   deleteEdge: (edgeId: string) => void
+
+  // editor history
+  undo: () => void
+  redo: () => void
+  canUndo: () => boolean
+  canRedo: () => boolean
 }
 
 function touch(wf: Workflow): Workflow {
@@ -67,12 +82,24 @@ export const useWorkflowStore = create<WorkflowStore>()(
         set((s) => {
           const wf = s.workflows[activeId]
           if (!wf) return s
-          return { workflows: { ...s.workflows, [activeId]: touch(mutate(wf)) } }
+          const next = touch(mutate(wf))
+          const history = s.history[activeId] ?? { past: [], future: [] }
+          return {
+            workflows: { ...s.workflows, [activeId]: next },
+            history: {
+              ...s.history,
+              [activeId]: {
+                past: [...history.past, structuredClone(wf)].slice(-HISTORY_LIMIT),
+                future: [],
+              },
+            },
+          }
         })
       }
 
       return {
         workflows: createSampleWorkflows(),
+        history: {},
         view: 'library',
         activeId: null,
 
@@ -135,7 +162,17 @@ export const useWorkflowStore = create<WorkflowStore>()(
           set((s) => {
             const wf = s.workflows[id]
             if (!wf) return s
-            return { workflows: { ...s.workflows, [id]: touch({ ...wf, ...patch }) } }
+            const history = s.history[id] ?? { past: [], future: [] }
+            return {
+              workflows: { ...s.workflows, [id]: touch({ ...wf, ...patch }) },
+              history: {
+                ...s.history,
+                [id]: {
+                  past: [...history.past, structuredClone(wf)].slice(-HISTORY_LIMIT),
+                  future: [],
+                },
+              },
+            }
           }),
 
         importWorkflow: (wf) => {
@@ -183,6 +220,17 @@ export const useWorkflowStore = create<WorkflowStore>()(
             edges: wf.edges.filter((e) => e.source !== nodeId && e.target !== nodeId),
           })),
 
+        deleteSelectedNodes: () =>
+          mutateActive((wf) => {
+            const deleted = new Set(wf.nodes.filter((node) => node.selected).map((node) => node.id))
+            if (deleted.size === 0) return wf
+            return {
+              ...wf,
+              nodes: wf.nodes.filter((node) => !deleted.has(node.id)),
+              edges: wf.edges.filter((edge) => !deleted.has(edge.source) && !deleted.has(edge.target)),
+            }
+          }),
+
         updateNodeData: (nodeId, patch) =>
           mutateActive((wf) => ({
             ...wf,
@@ -213,6 +261,59 @@ export const useWorkflowStore = create<WorkflowStore>()(
             ...wf,
             edges: wf.edges.filter((e) => e.id !== edgeId),
           })),
+
+        undo: () => {
+          const { activeId } = get()
+          if (!activeId) return
+          set((s) => {
+            const workflow = s.workflows[activeId]
+            const history = s.history[activeId]
+            if (!workflow || !history || history.past.length === 0) return s
+            const previous = history.past[history.past.length - 1]
+            if (!previous) return s
+            return {
+              workflows: { ...s.workflows, [activeId]: touch(structuredClone(previous)) },
+              history: {
+                ...s.history,
+                [activeId]: {
+                  past: history.past.slice(0, -1),
+                  future: [structuredClone(workflow), ...history.future].slice(0, HISTORY_LIMIT),
+                },
+              },
+            }
+          })
+        },
+
+        redo: () => {
+          const { activeId } = get()
+          if (!activeId) return
+          set((s) => {
+            const workflow = s.workflows[activeId]
+            const history = s.history[activeId]
+            const next = history?.future[0]
+            if (!workflow || !history || !next) return s
+            return {
+              workflows: { ...s.workflows, [activeId]: touch(structuredClone(next)) },
+              history: {
+                ...s.history,
+                [activeId]: {
+                  past: [...history.past, structuredClone(workflow)].slice(-HISTORY_LIMIT),
+                  future: history.future.slice(1),
+                },
+              },
+            }
+          })
+        },
+
+        canUndo: () => {
+          const { activeId, history } = get()
+          return Boolean(activeId && history[activeId]?.past.length)
+        },
+
+        canRedo: () => {
+          const { activeId, history } = get()
+          return Boolean(activeId && history[activeId]?.future.length)
+        },
       }
     },
     {

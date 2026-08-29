@@ -1,5 +1,5 @@
 import type { DragEvent } from 'react'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import type { NodeTypes } from '@xyflow/react'
 import { Background, Controls, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
 import type { Workflow, WorkflowNodeType, WorkflowNode } from '../../types/workflow'
@@ -7,7 +7,7 @@ import { useActiveWorkflow, useSelectedNodeId, useWorkflowStore } from '../../st
 import { useThemeStore } from '../../store/themeStore'
 import { WorkflowNodeComponent } from '../canvas/WorkflowNode'
 import { decorateEdge, defaultEdgeOptions } from '../canvas/shared'
-import { BackIcon, PresentIcon, TrashIcon, PlusIcon } from '../common/Icon'
+import { BackIcon, PresentIcon, RedoIcon, TrashIcon, UndoIcon, PlusIcon } from '../common/Icon'
 import { ExportMenu } from '../common/ExportMenu'
 import { EdgeEditorPanel } from './EdgeEditorPanel'
 import { NodeEditorPanel } from './NodeEditorPanel'
@@ -33,14 +33,23 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
   const openShowcase = useWorkflowStore((s) => s.openShowcase)
   const updateWorkflowMeta = useWorkflowStore((s) => s.updateWorkflowMeta)
   const selectedNodeId = useSelectedNodeId()
-  const deleteNode = useWorkflowStore((s) => s.deleteNode)
-  const { setNodes, getNodes, getEdges, fitView } = useReactFlow<WorkflowNode>()
+  const onNodesChange = useWorkflowStore((s) => s.onNodesChange)
+  const { getNodes, getEdges, fitView } = useReactFlow<WorkflowNode>()
 
   const handleAutoLayout = () => {
     const layoutedNodes = getAutoLayoutNodes(getNodes(), getEdges(), 'TB')
-    setNodes([...layoutedNodes])
+    onNodesChange(layoutedNodes.map((node) => ({ id: node.id, type: 'position', position: node.position })))
     window.requestAnimationFrame(() => fitView())
   }
+  const selectedNodeCount = useWorkflowStore((s) => {
+    const active = s.activeId ? s.workflows[s.activeId] : null
+    return active?.nodes.filter((node) => node.selected).length ?? 0
+  })
+  const deleteSelectedNodes = useWorkflowStore((s) => s.deleteSelectedNodes)
+  const undo = useWorkflowStore((s) => s.undo)
+  const redo = useWorkflowStore((s) => s.redo)
+  const canUndo = useWorkflowStore((s) => Boolean(s.activeId && s.history[s.activeId]?.past.length))
+  const canRedo = useWorkflowStore((s) => Boolean(s.activeId && s.history[s.activeId]?.future.length))
 
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start gap-2 p-3">
@@ -108,13 +117,31 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
         >
           <PlusIcon /> Auto Layout
         </button>
+        <button
+          type="button"
+           onClick={undo}
+          disabled={!canUndo}
+          title="Undo (Ctrl/Cmd+Z)"
+          className="rounded-lg border border-gray-300 bg-white p-2 text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+        >
+          <UndoIcon />
+        </button>
+        <button
+          type="button"
+          onClick={redo}
+          disabled={!canRedo}
+          title="Redo (Ctrl/Cmd+Shift+Z)"
+          className="rounded-lg border border-gray-300 bg-white p-2 text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+        >
+          <RedoIcon />
+        </button>
         {selectedNodeId && (
           <button
             type="button"
-            onClick={() => deleteNode(selectedNodeId)}
+            onClick={deleteSelectedNodes}
             className="flex items-center gap-1.5 rounded-lg border border-rose-200 bg-white px-3 py-1.5 text-sm font-medium text-rose-600 transition hover:bg-rose-50 dark:border-rose-900 dark:bg-gray-800 dark:hover:bg-rose-950"
           >
-            <TrashIcon /> Delete node
+            <TrashIcon /> Delete {selectedNodeCount > 1 ? `${selectedNodeCount} nodes` : 'node'}
           </button>
         )}
         <ExportMenu workflow={workflow} />
@@ -136,6 +163,8 @@ function BuilderCanvas({ workflow }: { workflow: Workflow }) {
   const onEdgesChange = useWorkflowStore((s) => s.onEdgesChange)
   const onConnect = useWorkflowStore((s) => s.onConnect)
   const addNode = useWorkflowStore((s) => s.addNode)
+  const undo = useWorkflowStore((s) => s.undo)
+  const redo = useWorkflowStore((s) => s.redo)
   const hasSelectedEdge = useWorkflowStore((s) => {
     const wf = s.activeId ? s.workflows[s.activeId] : null
     return wf?.edges.some((e) => e.selected) ?? false
@@ -156,6 +185,20 @@ function BuilderCanvas({ workflow }: { workflow: Workflow }) {
     addNode(type, screenToFlowPosition({ x: e.clientX, y: e.clientY }))
   }
 
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!(event.ctrlKey || event.metaKey)) return
+      const target = event.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
+      if (event.key.toLowerCase() !== 'z') return
+      event.preventDefault()
+      if (event.shiftKey) redo()
+      else undo()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [redo, undo])
+
   return (
     <div className="flex h-full min-h-0">
       <NodePalette />
@@ -171,7 +214,15 @@ function BuilderCanvas({ workflow }: { workflow: Workflow }) {
           onDragOver={onDragOver}
           defaultEdgeOptions={defaultEdgeOptions}
           deleteKeyCode={['Backspace', 'Delete']}
-          colorMode={theme}
+          selectionOnDrag
+          selectionKeyCode={['Shift']}
+          multiSelectionKeyCode={['Shift']}
+          snapToGrid
+          snapGrid={[16, 16]}
+          onlyRenderVisibleElements
+          panOnScroll
+          zoomOnDoubleClick={false}
+          colorMode={theme === 'contrast' ? 'dark' : theme}
           fitView
         >
           <Background gap={18} />

@@ -7,7 +7,7 @@ import {
   ragPipeline,
   multiAgentReflection,
 } from './sampleWorkflows'
-import { AI_METRIC_PRESETS } from '../components/builder/NodeEditorPanel'
+import { AI_METRIC_PRESETS } from '../components/builder/aiMetricPresets'
 import { NODE_TYPE_META, COLOR_PALETTE, nodeColor, decorateEdge } from '../components/canvas/shared'
 import type { Workflow, WorkflowNode, WorkflowNodeType } from '../types/workflow'
 import { useWorkflowStore } from '../store/workflowStore'
