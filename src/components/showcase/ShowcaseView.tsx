@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import type { Edge, NodeTypes } from '@xyflow/react'
 import { Background, Controls, ReactFlow, ReactFlowProvider } from '@xyflow/react'
 import type { Workflow } from '../../types/workflow'
@@ -13,7 +13,6 @@ import { NodeDetailPanel } from './NodeDetailPanel'
 import { PlaybackControls } from './PlaybackControls'
 import { MockTerminal } from './MockTerminal'
 
-
 const nodeTypes: NodeTypes = { workflow: WorkflowNodeComponent }
 
 const TRAVERSED_STYLE = { stroke: '#10b981', strokeWidth: 2.5 }
@@ -24,6 +23,31 @@ function ShowcaseCanvas({ workflow }: { workflow: Workflow }) {
   const goLibrary = useWorkflowStore((s) => s.goLibrary)
   const openBuilder = useWorkflowStore((s) => s.openBuilder)
   const playback = usePlayback(workflow)
+
+  // Keyboard navigation for presentation mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) return
+
+      if (e.code === 'Space') {
+        e.preventDefault()
+        playback.toggle()
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault()
+        playback.next()
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault()
+        playback.prev()
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        openBuilder(workflow.id)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [playback, openBuilder, workflow.id])
 
   // Inject transient playback state into nodes/edges (never written to the store).
   const nodes = useMemo(
@@ -116,12 +140,13 @@ function ShowcaseCanvas({ workflow }: { workflow: Workflow }) {
           </div>
         </div>
 
-
-        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-10 flex flex-col items-center justify-end px-4 gap-4">
+        <div className="pointer-events-none absolute inset-x-0 bottom-4 z-10 flex flex-col items-center justify-end px-4 gap-2">
           <PlaybackControls playback={playback} />
           <MockTerminal playback={playback} />
+          <div className="rounded-full border border-gray-200/80 bg-white/90 px-3 py-0.5 text-[10px] font-medium text-gray-500 shadow-2xs backdrop-blur-sm dark:border-gray-700/80 dark:bg-gray-900/90 dark:text-gray-400">
+            ⌨️ Hotkeys: <kbd className="font-mono">Space</kbd> Play/Pause · <kbd className="font-mono">→</kbd> Next · <kbd className="font-mono">←</kbd> Prev · <kbd className="font-mono">Esc</kbd> Exit
+          </div>
         </div>
-
       </div>
       <NodeDetailPanel
         workflow={workflow}

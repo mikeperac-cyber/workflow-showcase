@@ -119,7 +119,7 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
         </button>
         <button
           type="button"
-           onClick={undo}
+          onClick={undo}
           disabled={!canUndo}
           title="Undo (Ctrl/Cmd+Z)"
           className="rounded-lg border border-gray-300 bg-white p-2 text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -148,7 +148,7 @@ function BuilderToolbar({ workflow }: { workflow: Workflow }) {
         <button
           type="button"
           onClick={() => openShowcase(workflow.id)}
-          className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+          className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-blue-700 shadow-xs"
         >
           <PresentIcon /> Present
         </button>
@@ -229,6 +229,43 @@ function BuilderCanvas({ workflow }: { workflow: Workflow }) {
           <Controls position="bottom-left" />
         </ReactFlow>
         <BuilderToolbar workflow={workflow} />
+
+        {/* Empty canvas state instructional guidance overlay */}
+        {workflow.nodes.length === 0 && (
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-6">
+            <div className="pointer-events-auto flex max-w-md flex-col items-center rounded-2xl border border-dashed border-gray-300 bg-white/90 p-8 text-center shadow-lg backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/90">
+              <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+                <PlusIcon width={24} height={24} />
+              </div>
+              <h3 className="text-base font-bold text-gray-900 dark:text-white">Your canvas is empty</h3>
+              <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                Drag node types from the left palette onto the canvas, press number keys{' '}
+                <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono dark:border-gray-600 dark:bg-gray-800">
+                  1
+                </kbd>
+                –
+                <kbd className="rounded border border-gray-300 bg-gray-100 px-1 font-mono dark:border-gray-600 dark:bg-gray-800">
+                  9
+                </kbd>
+                , or click below to start building.
+              </p>
+              <button
+                type="button"
+                onClick={() => addNode('start')}
+                className="mt-4 flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-blue-700 shadow-xs"
+              >
+                <PlusIcon width={14} height={14} /> Add Start Node
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Canvas instruction badge at bottom center */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex justify-center px-4">
+          <div className="rounded-full border border-gray-200/80 bg-white/90 px-3.5 py-1 text-[11px] font-medium text-gray-600 shadow-xs backdrop-blur-sm dark:border-gray-700/80 dark:bg-gray-900/90 dark:text-gray-300">
+            💡 Drag handles to connect nodes · Press <kbd className="font-mono">1</kbd>–<kbd className="font-mono">9</kbd> to insert · <kbd className="font-mono">Shift+Drag</kbd> to box select
+          </div>
+        </div>
       </div>
       {hasSelectedEdge ? <EdgeEditorPanel /> : <NodeEditorPanel />}
     </div>
